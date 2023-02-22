@@ -1,0 +1,114 @@
+Mejores prácticas para el diseño de ACLs STANDAR
+1. Identificar la fuente/origen (tráfico fuente)
+2. Trazar el trayecto del tráfico no permitido. 
+3. Trazar el trayecto del tráfico permitido. 
+4. Identificar el router donde se instalará la lista de control de acceso.
+5. Identificar la interfaz donde se va a asociar la lista de control de acceso.
+6. Escribir la ACL, instalarla y probarla.
+   NOTA: Realizar pruebas de conectividad antes y después de instalar una ACL
+
+REGLA, LAS LISTAS DE ACCESO ESTÁNDAR SE DEBEN INSTALAR LO MAS CERCA DEL DESTINO.
+
+!a.Diseña una lista de control de acceso estándar para impedir que las 
+!computadoras de la subred de Alumnos tengan acceso a la subred de Directivos.
+
+! DISEÑO DE LA ACL
+access-list 10 deny 132.254.89.0 0.0.0.127  
+access-list 10 permit any
+
+! INSTALAR UN ACL EN UNA INTERFAZ ROUTER A
+int g0/0
+ip access-group	10 out
+
+access-list 10 deny 132.254.89.0 0.0.0.127  
+! access-list 10 deny any ( 0.0.0.0 255.255.255.255)
+access-list 10 permit any
+
+access-list 10 deny 132.254.89.0 /25 wildcard
+255.255.255.255
+255.255.255.1000 0000
+255.255.255.128
+------------------
+0.0.0.127
+
+!b. Diseña una lista de control de acceso estándar para impedir 
+!que las computadoras de la subred de Profesores tengan acceso 
+!a la subred de Directivos.
+
+! DISEÑO DE LA ACL
+access-list 20 deny 132.254.89.232 0.0.0.7
+access-list 20 permit any
+
+! INSTALAR UN ACL EN UNA INTERFAZ ROUTER A
+int g0/0
+ip access-group	20 out
+
+/29 255.255.255.1111 1000
+ 255.255.255.255   
+ 255.255.255.248
+-----------------
+ 0. 0.0.7
+
+!c. Diseña una lista de control de acceso 
+!estándar para impedir que las computadoras de la
+!subredes de Profesores y Alumnos tengan acceso 
+!a la subred de Directivos.
+
+! DISEÑO DE LA ACL 30
+access-list 30 deny 132.254.89.232 0.0.0.7
+access-list 30 deny 132.254.89.0 0.0.0.127
+access-list 30 permit any
+
+! INSTALAR UN ACL EN UNA INTERFAZ ROUTER A
+int g0/0
+ip access-group	30 out
+
+255.255.255.255
+255.255.255.1000 0000
+255.255.255.128
+-----------------
+0.0.0.127
+
+! DISEÑO DE LA ACL 30
+access-list 30 permit 132.254.89.232 0.0.0.7
+access-list 30 permit 132.254.89.0 0.0.0.127
+access-list 30 deny any
+
+! INSTALAR UN ACL EN UNA INTERFAZ ROUTER A
+int g0/0
+ip access-group	30 out
+
+!d. Diseña una lista de control de acceso estándar para que
+!el visitante 01 no pueda acceder a la sección de servidores
+
+! DISEÑO DE LA ACL 40
+access-list 40 deny 132.254.89.120 0.0.0.0
+access-list 40 permit any
+
+! INSTALAR UN ACL EN UNA INTERFAZ ROUTER A
+int g0/1
+ip access-group	40 out
+
+! DISEÑO DE LA ACL 40
+access-list 40 deny host 132.254.89.120
+access-list 40 permit any
+
+! INSTALAR UN ACL EN UNA INTERFAZ ROUTER A
+int g0/1
+ip access-group	40 out
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

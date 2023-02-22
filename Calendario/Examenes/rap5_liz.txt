@@ -1,0 +1,65 @@
+a) Diseña una lista de control de acceso estándar que impida 
+que las computadoras de la subred de Teams e Invitados 
+tengan acceso a la sección de Servidores.
+
+access-list 10 deny 132.254.89.0 0.0.0.127 
+access-list 10 deny 132.254.89.192 0.0.0.31
+access-list 10 permit any
+
+RServidores
+int g0/1
+ip access-group 10 out 
+
+b) Diseña una lista de control de acceso extendida que 
+impida todo tipo de tráfico que se dirige al servidor 
+UVA.com y que sale desde cualquier IP asociada con la 
+subred de los Invitados. 
+El resto del tráfico debe pasar libremente.
+
+access-list 110 deny ip 132.254.89.192 0.0.0.31 host 65.0.1.10 
+access-list 110 permit ip any any
+
+!RServidores
+int g0/0
+ip access-group 110 in
+
+c. Diseña una lista de control de acceso extendida para impedir
+que las computadoras de la subred de Teams tengan acceso al 
+servidor de Score Board vía el protocolo FTP, pero que el resto del 
+tráfico pase libremente (HTTP, Telnet, ping, etc.). 
+En esta lista de control de acceso todas las direcciones IP 
+del resto de las subredes internas e IPs del exterior, 
+pueden acceder sin restricción a todos los servicios instalados 
+en la subred de SERVIDORES. 
+El protocolo FTP utiliza los puertos 20 y 21 del protocolo TCP.
+
+access-list 130 deny tcp 132.254.89.0 0.0.0.127 host 132.254.89.129 eq 20
+access-list 130 deny tcp 132.254.89.0 0.0.0.127 host 132.254.89.129 eq 21
+access-list 130 permit ip any any
+
+!RConcurso
+int g0/1
+ip access-group 130 in
+
+d) Diseña una lista de control de acceso extendida que sólo 
+vía el protocolo WEB permita acceder desde las IP’s del exterior 
+al servidor del CONCURSO. El resto del tráfico, al igual que 
+el acceso a los otros servidores no está permitido. 
+El protocolo HTTP utiliza el puerto 80 del protocolo TCP.
+
+Router Concurso
+access-list 140 permit tcp any host 132.254.89.236 eq 80
+
+int s0/0/0
+ip access-group 140 in
+
+router(config)#____________________________________________________
+router(config)#____________________________________________________
+router(config)#____________________________________________________
+
+(20 puntos)
+
+¿En qué router asignarás esta lista de control de acceso? _____________ (1 punto)
+
+router(config)# interface _________ (2 puntos)
+router(config-if)#_____________________ (2 puntos)

@@ -1,0 +1,309 @@
+--------- ISP Transtelco --------
+Ya configurado
+
+-------- R-FamFernandez -------
+enable
+config t
+
+hostname R-FamFernandez
+
+service password-encryption
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int g0/1
+description Zona de Residentes
+ip address 172.16.4.38 255.255.255.248
+ip nat inside
+no shut
+
+int S0/0/0
+descripcion La conexion con el R-SalonFiestas 
+clock rate 128000
+ip address 172.16.4.57 255.255.255.252
+ip nat inside
+no shut
+
+int S0/0/1
+description La conexion con el ISP
+ip address 16.4.64.125 255.255.255.128
+ip nat outside
+no shut
+
+ip route 0.0.0.0  0.0.0.0 s0/0/1
+
+router eigrp 2000
+network 172.16.0.0
+network 16.0.0.0
+redistribute static
+passive-int s0/0/1
+passive-int g0/1
+no auto
+
+!----------------------------------------
+! DHCP
+! ---------------------------------------
+! DHCP Exceptions
+ip dhcp excluded-address 172.16.4.38
+ip dhcp excluded-address 172.16.4.33
+
+! DHCP Pool
+ip dhcp pool Residentes
+network 172.16.4.32 255.255.255.248
+default-router 172.16.4.38
+
+!----------------------------------------
+! NAT
+! ---------------------------------------
+! NAT estático (Servidor Fotos&Video)
+ip nat inside source static 172.16.4.49 65.10.105.192
+
+! NAT dinámico (PAT)
+ip nat pool MyPool 65.10.105.193 65.10.105.255 netmask 255.255.255.192
+
+! Definir quién puede acceder al NAT dinámico
+access-list 1 permit 172.16.0.0 0.0.255.255
+    
+! Declarar el NAT o PAT dinámico
+ip nat inside source list 1 pool MyPool overload
+
+-------- R-SalonFiestas ----------
+enable
+config t
+
+hostname R-SalonFiestas
+
+service password-encryption
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int S0/1/0
+description Conexion con R-FamFernandez 
+ip address 172.16.4.58 255.255.255.252
+ip nat inside
+no shut
+
+int g0/0
+description Zona de Fotos&Videos
+ip address 172.16.4.50 255.255.255.252
+ip nat inside
+no shut
+
+int g0/1.1
+description Gestion
+encapsulation dot1Q 1
+ip address 172.16.4.54 255.255.255.252
+ip helper-address 172.16.4.57
+ip nat inside
+no shut
+
+int g0/1.10
+description Camerinos
+encapsulation dot1Q 10
+ip address 172.16.4.46 255.255.255.248
+ip helper-address 172.16.4.57
+ip nat inside
+no shut
+
+int g0/1.20
+description Invitados
+encapsulation dot1Q 20
+ip address 172.16.3.254 255.255.252.0
+ip helper-address 172.16.4.57
+ip nat inside
+no shut
+
+int g0/1.30
+description Prensa
+encapsulation dot1Q 30
+ip address 172.16.4.30 255.255.255.224
+ip helper-address 172.16.4.57
+ip nat inside
+no shut
+
+int g0/1
+no shut
+
+router eigrp 2000
+network 172.16.0.0
+passive-int g0/0
+passive-int g0/1
+no auto
+
+
+Agregar los DHCPs
+----------------------
+!VLAN 10
+!------------ 
+! Camerinos 172.16.4.40/29
+
+! DIRECCIONES EXCLUIDAS
+ip dhcp excluded-address 172.16.4.46
+
+! DHCP para Camerinos g0/1.10
+ip dhcp pool Camerinos
+network 172.16.4.40 255.255.255.248
+default-router 172.16.4.46
+exit
+
+!VLAN 20
+!------------ 
+! Invitados 172.16.0.0/22
+
+! DIRECCIONES EXCLUIDAS
+ip dhcp excluded-address 172.16.3.254
+
+! DHCP para Invitados g0/1.20
+ip dhcp pool Invitados
+network 172.16.0.0 255.255.252.0
+default-router 172.16.3.254
+exit
+
+!VLAN 30
+!------------ 
+! Prensa 172.16.4.0 /27
+
+! DIRECCIONES EXCLUIDAS
+ip dhcp excluded-address 172.16.4.30
+
+! DHCP para Prensa g0/1.30
+ip dhcp pool Prensa
+network 172.16.4.0 255.255.255.224
+default-router 172.16.4.30
+exit
+
+!-----------------------------------------------------
+! Lista de acceso extendidas (lo más cerca del origen)
+!-----------------------------------------------------
+!
+! Ninguna de las direcciones IP de las subredes de invitados, prensa o camerinos, 
+! tengan acceso a ninguno de los servicios (FTP y/o WWW) del servidor Los 3 Potrillos.
+
+access-list 100 deny tcp 172.16.4.40 0.0.0.7 host 172.16.4.33 eq 20
+access-list 100 deny tcp 172.16.4.40 0.0.0.7 host 172.16.4.33 eq 21
+access-list 100 deny tcp 172.16.4.40 0.0.0.7 host 172.16.4.33 eq 80
+access-list 100 deny tcp 172.16.0.0 0.0.3.255 host 172.16.4.33 eq 20
+access-list 100 deny tcp 172.16.0.0 0.0.3.255 host 172.16.4.33 eq 21
+access-list 100 deny tcp 172.16.0.0 0.0.3.255 host 172.16.4.33 eq 80
+access-list 100 deny tcp 172.16.4.0 0.0.0.31 host 172.16.4.33 eq 20
+access-list 100 deny tcp 172.16.4.0 0.0.0.31 host 172.16.4.33 eq 21
+access-list 100 deny tcp 172.16.4.0 0.0.0.31 host 172.16.4.33 eq 80
+access-list 100 permit ip any any 
+
+int s0/1/0
+ip access-group 100 out
+
+!para que el invitado 007 no pueda acceder a los servicios del servidor de Facebook.
+access-list 120 deny tcp host 172.16.0.2 host 54.173.144.172
+access-list 120 permit ip any any
+
+int g0/1.20
+ip access-group 120 in
+
+! ============================
+! ===== SwitchCentral ======
+! ============================
+enable
+config t
+hostname SwitchCentral
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+! Creación de la base de datos de las VLANs
+vlan 10
+name Camerinos
+exit
+
+vlan 20
+name Invitados
+exit
+
+vlan 30
+name Prensa
+exit
+
+! Definición de los puertos de acceso y relación a que VLAN 10
+int range f1/1
+switchport mode access
+switchport access vlan 10
+
+int range f2/1
+switchport mode access
+switchport access vlan 10
+
+int range f8/1
+switchport mode access
+switchport access vlan 20
+
+int range f9/1
+switchport mode access
+switchport access vlan 30
+
+! Definición de puertos trunk G0/1
+int g0/1
+switchport mode trunk
+no shut
+
+int vlan 1
+description VLAN administrativa
+ip address 172.16.4.53 255.255.255.252
+no shut
+
+ip default-gateway 172.16.4.54
+
+--------------------------------
+---- switch : SalonFiestas -----
+--------------------------------
+enable
+config t
+hostname Switch-SalonFiestas
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+vlan 30
+name Prensa
+
+int range f8/1
+switchport mode access
+switchport access vlan 30
+
+int range f9/1
+switchport mode access
+switchport access vlan 30
+
+
+

@@ -1,0 +1,64 @@
+--------- MyISP --------
+Ya Configurado !!!!
+
+-------- RFrontera -------
+enable
+config t
+
+hostname
+
+service password-enc
+no ip domain-lookup
+
+line con 0
+password
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password 
+
+int S0/0/0
+ip address
+no shut
+
+int S0/0/1
+description 
+no shut
+
+int g0/0
+no shut
+
+
+-------- RA ----------
+enable
+config t
+
+hostname 
+
+service password-enc
+no ip domain-lookup
+
+line con 0
+password
+login
+logging sync
+
+line vty 0 4
+login
+
+enable password class
+
+int S0/0/0
+no shut
+
+int g0/0
+no shut
+
+int g0/1
+no shut
+
+

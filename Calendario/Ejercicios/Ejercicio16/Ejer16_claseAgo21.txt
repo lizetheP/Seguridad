@@ -1,0 +1,103 @@
+! DHCP VLAN HommeOffice
+ip dhcp excluded-address 192.168.0.1 192.168.0.2
+ip dhcp excluded-address 192.168.0.30
+ip dhcp pool HommeOffice
+network 192.168.0.0 255.255.255.224
+default-router 192.168.0.30
+
+! DHCP VLAN Redes sociales
+ip dhcp excluded-address 192.168.0.110
+ip dhcp pool RedesSociales
+network 192.168.0.96 255.255.255.240
+default-router 192.168.0.110
+
+! DHCP VLAN Profesional
+ip dhcp excluded-address 192.168.0.62
+ip dhcp pool Profesional
+network 192.168.0.32 255.255.255.224
+default-router 192.168.0.62
+
+! DHCP VLAN Educación básica
+ip dhcp excluded-address 192.168.0.94
+ip dhcp pool EduBasica
+network 192.168.0.64 255.255.255.224
+default-router 192.168.0.94
+
+! DHCP VLAN Entretenimiento
+ip dhcp excluded-address 192.168.0.126
+ip dhcp pool Entretenimiento
+network 192.168.0.112 255.255.255.240
+default-router 192.168.0.126
+
+access-list 1 permit 192.168.0.0 0.0.0.255
+ip nat inside source list 1 interface g0/0 overload
+
+!ip nat pool MyPool 189.172.74.90 netmask 255.255.255.252
+!ip nat inside source list 1 pool MyPool overload
+
+int g0/0
+ip nat outside
+
+int g0/1.1
+ip nat inside
+
+int g0/1.10
+ip nat inside
+
+int g0/1.20
+ip nat inside
+
+int g0/1.30
+ip nat inside
+
+int g0/1.40
+ip nat inside
+
+int g0/1.50
+ip nat inside
+
+!ip nat inside source static 192.168.0.1 189.172.74.90
+
+ip nat inside source static tcp 192.168.0.1 80 189.172.74.90 65000
+ip nat inside source static tcp 192.168.0.129 23 189.172.74.90 23
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

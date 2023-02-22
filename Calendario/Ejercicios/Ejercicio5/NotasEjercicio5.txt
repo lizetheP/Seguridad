@@ -1,0 +1,56 @@
+Consideraciones importantes EIGRP:
+1. Todos los router deben usar el mismo Sistema Autónomo (AS)
+   AS  = 1 - 65 536
+2. El protocolo EIGRP utiliza como Networks la dirección de
+   la clase o de la red completa.
+3. Incluye rutas pasivas y retransmisión de rutas estáticas.
+
+Estrategia para migración de RIP a EIGRP:
+1. Pedir passwords de routers (cisco, class)
+2. Recuperar la configuración de RIP (sh run)
+3. Apagar el servicio de RIP (no router rip)
+4. Diseñar protocolo EIGRP en cada router.
+5. Copiar configuración EIGRP en cada router
+6. Pruebas de conectividad.
+
+
+!ROUTER FRONTERA RIP
+router rip
+version 2
+redistribute static
+default-information originate
+passive-interface GigabitEthernet0/0
+passive-interface GigabitEthernet0/1
+passive-interface Serial0/0/0
+network 198.68.1.0
+network 210.10.10.0
+network 221.57.1.0
+
+!ROUTER FRONTERA EIGRP
+router eigrp 2021
+redistribute static
+passive-interface GigabitEthernet0/0
+passive-interface GigabitEthernet0/1
+passive-interface Serial0/0/0
+network 198.68.1.0
+network 210.10.10.0
+network 221.57.1.0
+
+! ROUTER A
+router eigrp 2021
+passive-interface GigabitEthernet0/0
+passive-interface GigabitEthernet0/1
+network 196.128.11.0
+network 198.68.1.0
+
+
+
+
+
+
+
+
+
+
+
+

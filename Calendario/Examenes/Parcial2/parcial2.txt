@@ -1,0 +1,121 @@
+a) Diseña una lista de control de acceso extendida para impedir que cualquier 
+tipo de tráfico que se genere desde una computadora de la subred de Alumnos 
+tenga acceso a cualquier dirección IP de la subred de los Profesores. 
+El tráfico que se generé  de otras subredes o que provenga del exterior pasa 
+libremente.
+NOTA: Esta lista de control de acceso no impide que los Alumnos accedan a 
+los servicios externos de Internet y a los servicios de la subred Servidores
+ y Directores.     
+
+access-list 100 deny ip 172.20.0.0 0.0.0.127 172.20.0.128 0.0.0.63
+access-list 100 permit ip any any
+
+RB
+int g0/1
+ip access-group 100 in
+
+access-list 100 deny ip 132.254.89.0 0.0.0.127 132.254.89.192 0.0.0.31
+access-list 100 permit ip any any
+
+!RB
+int g0/1
+ip access-group 100 in
+
+El servidor del ScoreBoard ha sido instalado en la dirección IP 172.16.1.221. 
+Diseña una lista de control de acceso que permita que cualquier dirección IP 
+proveniente del exterior tenga acceso exclusivamente al servidor del ScoreBoard 
+vía el protocolo WEB (exclusivamente el puerto 80). 
+Este servidor estará "oculto" para otro tipo de tráfico que provenga del exterior 
+y  que no sea WEB.
+
+
+b) Diseña una lista de control de acceso que permita que cualquier dirección IP 
+proveniente del exterior tenga acceso exclusivamente al servidor Siqueiros vía el 
+protocolo WEB (exclusivamente el puerto 80). Este servidor estará "oculto" 
+para otro tipo de tráfico que provenga del exterior y  que no sea WEB.
+
+access-list 110 permit tcp any host 172.20.0.226 eq 80
+access-list 110 deny ip any host 172.20.0.226
+access-list 110 permit ip any any
+
+!RB
+int s0/0/0 
+ip access-group 110 in
+                                                                                                                                                                
+
+c. Diseña una lista de control de acceso extendida que impida que ninguna dirección IP 
+de la subred de Profesores tengan acceso al servidor de LOL vía el protocolo telnet (23). 
+El resto del tráfico, como web, ftp, ssh,  ping, etc.,circula libremente.
+
+¿Cuál es la lista de control de acceso que permite realizar la acción solicitada?
+
+access-list 120 deny tcp 172.20.0.128 0.0.0.63 host 5.4.3.2 eq 23
+access-list 120 permit ip any any
+
+!RA
+int g0/0 
+ip access-group 120 in
+
+d) Diseña una lista de control de acceso estándar que permita que únicamente las 
+computadoras de la subred de profesores tengan acceso a la subred de Servidores,
+excepto la computadora del profesor A.
+
+access-list 1 deny host 172.20.0.132
+access-list 1 permit 172.20.0.128 0.0.0.63
+
+ra
+int g0/1
+ip access-group 1 out
+
+e) Diseña una lista de control de acceso estándar que permita que únicamente la 
+computadora del Director B tenga acceso a la subred de Servidores.
+
+access-list 2 permit host 172.20.0.195
+
+ra
+int g0/1
+ip access-group 2 out
+
+f) Diseña una lista de control de acceso estándar para impedir que las computadoras
+de la subred de Directivos tengan acceso a la subred de Profesores.
+
+access-list 3 deny 172.20.0.192 0.0.0.31
+access-list 3 permit any
+
+ra
+int g0/0
+ip access-group 3 out
+
+g) Diseña una lista de control de acceso extendida para impedir que las computadoras
+de la subred de Alumnos tengan acceso a los servidores Siqueiros y Picasso.
+
+access-list 140 deny ip 172.20.0.0 0.0.0.127 host 172.20.0.226
+access-list 140 deny ip 172.20.0.0 0.0.0.127 host 172.20.0.227
+access-list 140 permit ip any any
+
+rb
+int g0/1
+ip access-group 140 in
+ 
+h) Diseña una lista de control de acceso extendida que permita únicamente 
+tráfico ssh (22) de la subred de profesores a la subred de servidores.
+
+access-list 150 permit tcp 172.20.0.128 0.0.0.63 172.20.0.224 0.0.0.15 eq 22
+access-list 150 deny ip any any
+
+ra
+int g0/0
+ip access-group 150 in
+ 
+h) Diseña una lista de control de acceso extendida que permita únicamente 
+tráfico ftp (20 y 21) de la subred de alumnos a la subred de profesores.
+
+access-list 160 permit tcp 172.20.0.0 0.0.0.127 172.20.0.128 0.0.0.63 eq 20
+access-list 160 permit tcp 172.20.0.0 0.0.0.127 172.20.0.128 0.0.0.63 eq 21
+access-list 160 deny ip any any
+
+ra
+int g0/1
+ip access-group 150 in
+
+

@@ -1,0 +1,118 @@
+
+---------------------------------------------------------------
+Configuración del router Gateway
+---------------------------------------------------------------
+
+enable
+config t
+hostname Gateway
+service password-encryption
+enable secret class
+no ip domain-lookup
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/1
+ip address 192.168.1.1 255.255.255.0
+no shut
+
+int s0/1/1
+ip address 209.165.201.18 255.255.255.252
+no shut
+
+! DEFAULT ROUTE
+! ---------------------------------------------------------------
+!Create a default route from the Gateway router to the ISP router
+ip route 0.0.0.0 0.0.0.0 209.165.201.17
+
+! CONFIGURE NAT OVERLOAD
+! ---------------------------------------------------------------
+! Configure the Gateway router to translate the IP addresses from 
+! the 192.168.1.0/24 network to one of the six usable addresses in 
+! the 209.165.200.224/29 range
+
+!Define an access control list that matches the LAN private IP addresses.
+!-------------------------------
+! ACL 1 is used to allow the 192.168.1.0/24 network to be translated.
+
+access-list 1 permit 192.168.1.0 0.0.0.255
+
+!Define the pool of usable public IP addresses.
+------------------------------------------------ 
+ip nat pool MyPool 209.165.200.225 209.165.200.230 netmask 255.255.255.248
+
+!Define the NAT from the inside source list to the outside pool.
+--------------------------------------------------------------- 
+! Relación de esa lista quién va a acceder a qué pool
+ip nat inside source list 1 pool MyPool overload
+
+int g0/1
+ip nat inside
+exit
+
+int s0/1/1
+ip nat outside
+!Interfaces de conexión con el exterior
+
+!Associate the source list with the outside interface.
+!---------------------------------------------------------- 	
+ip nat inside source list 1 interface serial 0/1/1 overload 
+
+-------------------------------------------------
+access-list 1 permit 192.168.1.0 0.0.0.255
+ip nat pool MyPool 209.165.200.225 209.165.200.230 netmask 255.255.255.248
+ip nat inside source list 1 pool MyPool overload
+
+int g0/1
+ip nat inside
+exit
+
+int s0/1/1
+ip nat outside
+
+
+---------------------------------------------------------------
+Configuración del router ISP
+---------------------------------------------------------------
+
+enable
+config t
+hostname ISP
+service password-encryption
+enable secret class
+no ip domain-lookup
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int Lo0
+ip address 192.31.7.1 255.255.255.255
+no shut
+
+int s0/1/0
+ip address 209.165.201.17 255.255.255.252
+clock rate 128000
+no shut
+
+! RUTA ESTÁTICA FROM ISP ROUTER TO THE GATEWAY ROUTER
+! Create a static route from the ISP router to the Gateway router 
+! using the assigned public network address range 209.165.200.224/27.
+
+ip route 209.165.200.224 255.255.255.248 209.165.201.18 

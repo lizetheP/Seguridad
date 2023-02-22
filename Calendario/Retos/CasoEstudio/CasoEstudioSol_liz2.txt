@@ -1,0 +1,379 @@
+--------- ISP --------
+enable
+config t
+
+hostname ISP
+
+service password-encryption
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int g0/0
+ip address 70.1.1.1 255.255.255.248
+no shut
+
+int S0/1/0
+clock rate 128000
+ip address 30.4.5.1 255.255.255.128
+no shut
+
+ip route 172.30.0.0 255.255.0.0 s0/1/0
+
+-------- ROrganizadores -------
+enable
+config t
+
+hostname ROrganizadores
+
+service password-encryption
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int g0/1
+ip address 172.30.18.62 255.255.255.192
+ip nat inside
+no shut
+
+int S0/0/0
+clock rate 128000
+ip address 172.30.18.137 255.255.255.252
+ip nat inside
+no shut
+
+int S0/0/1
+ip address 30.4.5.2 255.255.255.128
+ip nat outside
+no shut
+
+ip route 0.0.0.0  0.0.0.0 s0/0/1
+
+router rip 
+v 2
+network 172.30.0.0
+redistribute static
+passive-int s0/0/1 (2)
+passive-int g0/1
+no auto
+
+router eigrp 2000
+network 172.30.18.136 0.0.0.3
+network 172.30.18.0 0.0.0.63
+redistribute static
+passive-int s0/0/1 (2)
+passive-int g0/1
+
+router eigrp 2000
+network 172.30.0.0
+redistribute static
+passive-int s0/0/1 (2)
+passive-int g0/1
+no auto
+
+router ospf 2000
+network 172.30.18.136 0.0.0.3 area 0
+network 172.30.18.0 0.0.0.63 area 0
+default-information originate
+passive-int s0/0/1 (2)
+passive-int g0/1
+
+!----------------------------------------
+! DHCP
+! ---------------------------------------
+! DHCP Exceptions interfaces
+ip dhcp excluded-address 172.30.18.62
+ip dhcp excluded-address 172.30.18.126
+ip dhcp excluded-address 172.30.15.254
+ip dhcp excluded-address 172.30.17.254
+
+! DHCP Exceptions Servers
+ip dhcp excluded-address 172.30.18.1
+
+! DHCP Pool
+ip dhcp pool Organizadores
+network 172.30.18.0 255.255.255.192
+default-router 172.30.18.62
+
+ip dhcp pool Camerinos
+network 172.30.18.64 255.255.255.192
+default-router 172.30.18.126
+
+ip dhcp pool Publico
+network 172.30.0.0 255.255.240.0
+default-router 172.30.15.254
+
+ip dhcp pool Prensa
+network 172.30.16.0 255.255.254.0
+default-router 172.30.17.254
+!----------------------------------------
+! NAT
+! ---------------------------------------
+! NAT estático (Servidor Organizadores)
+ip nat inside source static 172.30.18.1 40.10.10.192
+
+! NAT estático (Servidor Fotos&Video)
+ip nat inside source static 172.30.18.129 40.10.10.193
+
+! NAT dinámico (PAT)
+ip nat pool MyPool 40.10.10.194 40.10.10.255 netmask 255.255.255.192
+
+! Definir quién puede acceder al NAT dinámico
+access-list 1 permit 172.30.0.0 0.0.255.255
+    
+! Declarar el NAT o PAT dinámico
+ip nat inside source list 1 pool MyPool overload
+
+
+-------- REstadio ----------
+enable
+config t
+
+hostname REstadio
+
+service password-encryption
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int g0/0
+description Zona de Fotos&Videos
+ip address 172.30.18.130 255.255.255.252
+ip nat inside
+no shut
+
+int g0/1.1
+description Gestion
+encapsulation dot1Q 1 native
+ip address 172.30.18.134 255.255.255.252
+ip nat inside
+no shut
+
+int g0/1.10
+description Camerinos
+encapsulation dot1Q 10
+ip address 172.30.18.126 255.255.255.192
+ip helper-address 172.30.18.137
+ip nat inside
+no shut
+
+int g0/1.20
+description Publico
+encapsulation dot1Q 20
+ip address 172.30.15.254 255.255.240.0
+ip helper-address 172.30.18.137
+ip nat inside
+no shut
+
+int g0/1.30
+description Prensa
+encapsulation dot1Q 30
+ip address 172.30.17.254 255.255.254.0
+ip helper-address 172.30.18.137
+ip nat inside
+no shut
+
+int S0/1/0
+description Conexion con ROrganizadores 
+ip address 172.30.18.138 255.255.255.252
+ip nat inside
+no shut
+
+int g0/1
+no shut
+
+router rip
+v 2
+network 172.30.0.0
+passive-int g0/0
+passive-int g0/1
+no auto
+
+router eigrp 2000
+network 172.30.0.0
+passive-int g0/0
+passive-int g0/1
+no auto
+
+router eigrp 2000
+network 172.30.18.136 0.0.0.3
+network 172.30.18.128 0.0.0.3
+network 172.30.18.132 0.0.0.3
+network 172.30.18.64 0.0.0.63
+network 172.30.0.0 0.0.15.255
+network 172.30.16.0 0.0.1.255
+passive-int g0/0
+passive-int g0/1
+
+router ospf 2000
+network 172.30.18.136 0.0.0.3 area 0 !
+network 172.30.18.128 0.0.0.3 area 0 !
+network 172.30.18.132 0.0.0.3 area 0 !
+network 172.30.18.64 0.0.0.63 area 0 !
+network 172.30.0.0 0.0.15.255 area 0 !
+network 172.30.16.0 0.0.1.255 area 0 !
+passive-int g0/0
+passive-int g0/1
+
+!-----------------------------------------------------
+! Lista de acceso extendidas (lo más cerca del origen)
+!-----------------------------------------------------
+!
+! Ninguna de las direcciones IP de las subredes de invitados, prensa o camerinos, 
+! tengan acceso a ninguno de los servicios (FTP y/o WWW) del servidor Los 3 Potrillos.
+
+
+
+access-list 100 deny tcp 172.30.18.64 0.0.0.63 host 172.30.18.1 eq 20
+access-list 100 deny tcp 172.30.18.64 0.0.0.63 host 172.30.18.1 eq 21
+access-list 100 deny tcp 172.30.18.64 0.0.0.63 host 172.30.18.1 eq 80
+
+access-list 100 deny tcp 172.30.0.0 0.0.15.255 host 172.30.18.1 eq 20
+access-list 100 deny tcp 172.30.0.0 0.0.15.255 host 172.30.18.1 eq 21
+access-list 100 deny tcp 172.30.0.0 0.0.15.255 host 172.30.18.1 eq 80
+
+access-list 100 deny tcp 172.30.16.0 0.0.1.255 host 172.30.18.1 eq 20
+access-list 100 deny tcp 172.30.16.0 0.0.1.255 host 172.30.18.1 eq 21
+access-list 100 deny tcp 172.30.16.0 0.0.1.255 host 172.30.18.1 eq 80
+
+access-list 100 deny ip 172.30.0.0 0.0.15.255 host 70.1.1.2
+
+access-list 100 permit ip any any 
+
+
+network 172.30.18.64 255.255.255.192
+network 172.30.0.0 255.255.240.0
+network 172.30.16.0 255.255.254.0
+int g0/1.10
+ip access-group 100 in
+
+int g0/1.20
+ip access-group 100 in
+
+int g0/1.30
+ip access-group 100 in
+
+!para que el invitado 007 no pueda acceder a los servicios del servidor de Facebook.
+access-list 120 deny tcp host 172.16.0.2 host 54.173.144.172
+access-list 120 permit ip any any
+
+int g0/1.20
+ip access-group 120 in
+
+! ============================
+! ===== SCentral ======
+! ============================
+enable
+config t
+hostname SCentral
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+! Creación de la base de datos de las VLANs
+vlan 10
+name Camerinos
+exit
+
+vlan 20
+name Publico
+exit
+
+vlan 30
+name Prensa
+exit
+
+! Definición de los puertos de acceso y relación a que VLAN 10
+int range fa1/1 , fa2/1 , fa3/1
+switchport mode access
+switchport access vlan 10
+
+int range fa4/1 , fa5/1 , fa6/1
+switchport mode access
+switchport access vlan 20
+
+int range fa7/1 , fa8/1
+switchport mode access
+switchport access vlan 30
+
+! Definición de puertos trunk G0/1
+int g0/1
+switchport mode trunk
+no shut
+
+int vlan 1
+description VLAN administrativa
+ip address 172.30.18.133 255.255.255.252
+no shut
+
+ip default-gateway 172.30.18.134
+
+--------------------------------
+---- switch : SEstadio -----
+--------------------------------
+enable
+config t
+hostname SEstadio
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+vlan 30
+name Prensa
+exit
+
+int range fa0/1 , fa1/1 , fa2/1 , fa3/1 , fa4/1 , fa5/1 , fa6/1 , fa7/1 , fa8/1 , fa9/1
+switchport mode access
+switchport access vlan 30
+
+
+ip dhcp pool Camerinos
+network 172.30.18.64 255.255.255.192
+default-router 172.30.18.126
+
+ip dhcp pool Publico
+network 172.30.0.0 255.255.240.0
+default-router 172.30.15.254
+
+ip dhcp pool Prensa
+network 172.30.16.0 255.255.254.0
+default-router 172.30.17.254

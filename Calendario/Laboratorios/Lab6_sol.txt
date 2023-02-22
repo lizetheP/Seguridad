@@ -1,0 +1,93 @@
+-------- MyRouter ----------
+enable
+config t
+
+hostname MyRouter
+
+service password-encryption
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int S0/0/0
+description La conexion con el ISP 
+ip address 132.254.89.241 255.255.255.252
+no shut
+
+int g0/0
+description Conexion con invitados
+ip add 192.254.20.126 255.255.255.128
+no shut
+
+int g0/1
+description Conexion con residentes
+ip add 192.254.20.190 255.255.255.192
+no shut
+
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+---- SwitchResidentes -----
+enable
+config t
+hostname SwitchResidentes
+
+banner motd #Acceso no autorizado#
+
+service password-encryption
+no ip domain-lookup
+
+enable password class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address 192.254.20.129 255.255.255.192
+no shut
+
+ip default-gateway 192.254.20.190
+
+
+---- SwitchInvitados -----
+enable
+config t
+hostname SwitchInvitados
+
+banner motd #Acceso no autorizado#
+
+service password-encryption
+no ip domain-lookup
+
+enable password class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address 192.254.20.1 255.255.255.128
+no shut
+
+ip default-gateway 192.254.20.126
+
+

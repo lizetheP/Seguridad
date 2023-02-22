@@ -1,0 +1,190 @@
+----------- ISP -----------
+  Ya configurado
+
+---------- Router Frontera ---------
+enable
+config t
+hostname FRONTERA
+
+no ip domain-lookup
+
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+
+int s0/0/0
+ip address 172.17.0.241 255.255.255.252
+clock rate 128000
+no shut
+ip nat inside
+
+int s0/0/1
+ip address 132.254.89.126 255.255.255.252 
+no shut
+ip nat outside
+
+int g0/0
+ip address 172.16.0.126 255.255.255.128
+no shut
+ip nat inside
+
+ip dhcp excluded-address 172.16.0.126
+
+ip dhcp pool RFG00
+network 172.16.0.0 255.255.255.128
+default-router 172.16.0.126
+
+! INTERCONEXIÓN DE PROTOCOLOS DIFERENTES
+
+router rip
+ver 2
+network 172.16.0.0
+redistribute static
+passive-inter g0/0
+! g0/0 opcional
+passive-inter s0/0/1
+passive-inter s0/0/0
+redistribute eigrp 1000
+
+router eigrp 1000
+network 172.17.0.0
+redistribute static
+passive-int g0/0
+passive-int s0/0/1
+redistribute rip
+
+ip route 0.0.0.0 0.0.0.0 s0/0/1
+
+router rip
+ver 2
+! Maneja VLSM
+network 172.16.0.0
+passive-inter s0/0/1
+! no quiero publicar tráfico hacia el exterior
+! no queremos que rip envie su tabla a una sección donde no lo entienden.
+passive-inter g0/0
+redistribute static
+passive-inter s0/0/0
+! no quiero que se inyecte tráfico de rip a 
+! la red eigrp (rosa)
+redistribute eigrp 1000
+!Lo que llega al router como eigrp en el router se transforma y 
+!se inyecta hacia rip
+! Tarda tiempo en converger.
+
+! El mismo número autónomo para todos routers
+! de lo contrario no pueden comunicarse
+router eigrp 1000
+network 172.17.0.0
+redistribute static
+! para redistribuir el tráfico estático
+passive-int g0/0
+passive-int s0/0/0
+! No quiero que esta interfase inyecte
+! el protocolo de color rosa a las interfases
+! de color amarillo
+! El router frontera mezcla los dos protocolos
+! en un tabla que va al tráfico de color rosa
+! y amarillo.
+passive-int s0/0/1
+! no quiero inundar tráfico salga hacia afuera
+redistribute rip
+! redistribuir rip 
+
+ip route 0.0.0.0 0.0.0.0 s0/0/1
+! ruta por default saca el tráfico hacia el exterior
+! saca todo el tráfico de la red interna hacia el exterior
+
+! NAT
+!----------------------------------------------
+ip nat pool PoolNatPublico 132.254.89.0 132.254.89.127 netmask 255.255.255.128 
+access-list 10 permit 172.16.0.0 0.0.255.255
+access-list 10 permit 172.17.0.0 0.0.255.255
+ip nat inside source list 10 pool PoolNatPublico overload
+
+
+ip nat inside source list 10 pool PoolNatPublico overload
+! overload utiliza una dirección ip pública adicionado de un protocolo dinámico
+! es decir, el número de puerto para hacer la traducción de direccionamiento
+! interno a externo.
+
+ip nat pool PoolNatPublico 132.254.89.0 132.254.89.127 netmask 255.255.255.128 
+! todo el bloque de direcciones es válido. 132.254.89.0/25
+! solo hay 128 direcciones públicas. El pool está limitado, por consiguiente overload
+access-list 10 permit 172.16.0.0 0.0.255.255
+! Traducción de subred amarillo
+access-list 10 permit 172.17.0.0 0.0.255.255
+! Traducción de subred rosa
+! La lista de control de acceso para dos compañías
+
+ip nat inside source list 10 pool PoolNatPublico overload
+! overload utiliza una dirección ip pública adicionado de un protocolo dinámico
+! es decir, el número de puerto para hacer la traducción de direccionamiento
+! interno a externo.
+
+
+-------- Router Rectoria ---------
+
+enable
+config t
+hostname RECTORIA
+
+no ip domain-lookup
+
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+
+int s0/0/0
+ip address 172.17.0.242 255.255.255.252
+no shut
+ip nat inside
+
+int g0/0
+ip address 172.17.0.190 255.255.255.192
+no shut
+ip nat inside
+
+int g0/1
+ip address 172.17.0.126 255.255.255.128
+no shut
+ip nat inside
+
+! DHCP DISTRIBUIDO PORQUE CADA ROUTER ENTREGA PARA LOS SOLICITANTES
+! DIRECTAMENTE CONECTADOS EL DIRECCIONAMIENTO IP
+
+ip dhcp excluded-address 172.17.0.190
+
+ip dhcp pool RRectoriaG00
+network 172.17.0.128 255.255.255.192
+default-router 172.17.0.190
+
+ip dhcp excluded-address 172.17.0.126
+
+ip dhcp pool RRectoriaG01
+network 172.17.0.0 255.255.255.128 
+default-router 172.17.0.126
+
+router eigrp 1000
+network 172.17.0.0
+passive-int g0/1
+passive-int g0/0
+!redistribute static
+
+

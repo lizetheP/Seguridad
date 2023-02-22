@@ -1,0 +1,341 @@
+-----------------------------
+Configuración S1
+-----------------------------
+
+vlan 20
+name Contabilidad
+
+vlan 10
+name Ingenieria
+
+vlan 99
+name Administrativa
+
+int fa0/6
+switchport mode access
+switchport access vlan 10
+
+int fa0/3
+switchport mode trunk
+
+int fa0/5
+switchport mode trunk
+
+-----------------------------
+Configuración S2
+-----------------------------
+
+vlan 20
+name Contabilidad
+
+vlan 10
+name Ingenieria
+
+vlan 99
+name Administrativa
+
+! El nombre no importa, el número de vlan si debe corresponder
+! entre todos los switches que están conectados.
+
+int vlan 99
+ip address 192.168.99.3 255.255.255.0
+
+ip default-gateway 192.168.99.1
+
+int f0/18
+switchport mode access
+switchport access vlan 20
+
+int fa0/3
+switchport mode trunk
+------------------------------------------------------------
+R1 
+------------------------------------------------------------
+en
+config t
+
+hostname R1
+
+int g0/0.10
+encapsulation dot1Q 10
+ip address 192.168.10.1 255.255.255.0
+
+int g0/0.20
+encapsulation dot1Q 20
+ip address 192.168.20.1 255.255.255.0
+
+int g0/0.99
+encapsulation dot1Q 99
+ip address 192.168.99.1 255.255.255.0
+
+int g0/0
+no shut
+
+int s0/0/0
+ip address 172.16.1.1 255.255.255.252
+clock rate 128000
+! clock rate 4000000
+
+no shut
+
+CONFIGURAR DHCP
+---------------------------------------
+! Vamos a excluir las primeras 10 direcciones IPs de cada VLAN
+
+ip dhcp excluded-address 192.168.10.1 192.168.10.10
+ip dhcp excluded-address 192.168.20.1 192.168.20.10
+
+ip dhcp pool INGENIERIA
+default-router 192.168.10.1
+network 192.168.10.0 255.255.255.0
+dns-server 192.168.30.2
+
+ip dhcp pool CONTABILIDAD
+default-router 192.168.20.1
+network 192.168.20.0 255.255.255.0
+dns-server 192.168.30.2
+
+router ospf 1
+network 192.168.20.0 0.0.0.255 area 0
+network 192.168.10.0 0.0.0.255 area 0
+network 192.168.99.0 0.0.0.255 area 0
+! Quiero que se propague mi red administrativa, eso 
+! dependería si quiero que conozcan esa red fuera
+! de mi red conectada al router R1.
+network 172.16.1.0 0.0.0.3 area 0  
+
+! El número de proceso de cada router es local, lo
+! que debe coincidir es el área 0. En OSPF, podemos poner
+! cada router con un número de proceso distinto.
+! Pero como buena práctica se sugiere poner el mismo 
+! número de proceso de enrutamiento en cada router, 
+! para saber que es una misma configuración. Pero jalaría
+! si ponemos en un router ospf 1, en otro 2 y otro 3.
+! Ahora si nos equivocamos en el área, ahí si ya no funcionaría.
+
+! Aquí debe haber conectividad de todo a todo.
+
+-----------------------------------------------------
+ROUTER 2
+-----------------------------------------------------
+en
+config t
+
+hostname R2
+int s0/0/0
+ip address 172.16.1.2 255.255.255.252
+no shut
+
+int s0/0/1
+ip address 172.16.2.1 255.255.255.252
+clock rate 128000
+no shut
+
+int s0/1/0
+ip address 200.10.10.29 255.255.255.252
+clock rate 128000
+no shut
+
+int g0/1
+ip address 192.168.30.1 255.255.255.0
+no shut
+
+router ospf 1
+network 172.16.2.0 0.0.0.3 area 0
+!*
+network 192.168.30.0 0.0.0.255 area 0
+network 172.16.1.0 0.0.0.3 area 0
+passive-interface g0/1
+passive-interface s0/1/0
+
+!*
+! En cada red espero se levante la adjacencia con su red vecina
+! Ya se levantó la adjacencia, ya hay dos routers hablando OSPF
+! Solo agrego las redes que están dentro de mi corporación
+!----------------
+! El área 0, es simplemente porque con el protocolo OSPF
+! tú puedes configurar múltiples áreas, cuando tienes
+! una red super grande como la del tec
+! de monterrey real, puedes agrupar regiones y cada región
+! es un área y el área 0 interconecta a todas las áreas.
+! La ventaja de fraccionar en áreas es que si una red se
+! cae, solamente se propaga eso dentro de su área y no afecta
+! a todo el sistema autónomo de la organización.
+! Por eso solamente se fracciona en áreas.
+! Cuando la red no es tan grande, como en este caso que
+! solamente tenemos tres routers de la organización,
+! normalmente todos los routers se ponen en el área 0.
+! La red que va al proveedor no se mete, porque esa red
+! no es mia (200.10.10.28). Solo agrego las redes que forman
+! parte de la organización dentro de las cuales se van a 
+! desplegar las actualizaciones del ruteo.
+! Esta red es del proveedor de servicios y el me cobra por
+! conectarme a esa red (200.10.10.28) y a ese enlace 
+! (209.165.200.228) que me manda hacia
+! Internet.
+
+! Este router es el router frontera o border router,
+! debemos crear la ruta estática por default y propagarla
+! hacia los routers de la organización
+
+default-information originate
+
+ip route 0.0.0.0 0.0.0.0 s0/1/0
+
+! LISTAS DE ACCESO
+ip access-list extended FIREWALL
+permit tcp any host 200.10.10.20 eq 80
+permit tcp any host 200.10.10.20 eq 443
+
+!configuramos la ip pública del servidor.
+!Evite que el tráfico de Internet haga ping en las redes internas, 
+!mientras continúa permitiendo que las interfaces LAN hagan ping en la PC 
+!con Internet
+!En pocas palabras que no me puedan hacer ping de afuera de mi red, pero que mis ingenieros PCs puedan pinguear hacia afuera.
+
+permit icmp any any echo-reply
+
+! FALTA aplicar la lista de acceso a la interfaz para que filtre
+! trafico y bloque tráfico por consiguiente.
+! En qué interfaz lo vamos a aplicar y en qué sentido.
+! Queremos filtrar el tráfico de Internet hacia el interior de la red.
+! Cuál es la intefaz que nos conecta hacia Internet la interfaz s0/1/0. 
+! Ahí vamos a colocar nuestro cortafuegos y en qué sentido?
+! En qué sentido quiero filtrar, quiero filtra el tráfico que proviene
+! o entra de Internet.
+
+int s0/1/0
+ip access-group FIREWALL in 
+! in (tráfico de entrada)
+
+Ya no puedo hacer ping del internet hacia el servidor.
+
+
+----------------------------------------------
+ROUTER R3
+----------------------------------------------
+en
+config t
+
+hostname R3
+
+int s0/0/1
+ip address 172.16.2.2 255.255.255.252
+no shut
+
+int g0/1
+ip address 192.168.50.1 255.255.255.0
+no shut
+
+! SE configuran las redes directamente conectadas al router.
+! Son dos redes
+
+router ospf 1
+network 192.168.50.0 0.0.0.255 area 0
+network 172.16.2.0 0.0.0.3 area 0
+passive-interface g0/1
+
+NAT ESTÁTICO
+------------------
+!Primero realizaremos la traducción estática de la IP privada del servidor web por la dirección pública asignada 200.10.10.20.
+!ip nat inside source static 192.168.30.2 200.10.10.20
+
+ip nat inside source static 192.168.30.2 200.10.10.20
+
+! Configurar interfaces inside y outside
+
+int g0/1
+ip nat inside
+! Por aquí van a entrar las direcciones que serán traducidas.
+
+int s0/1/0
+ip nat outside
+!Por donde van a salir las direcciones que ya han sido traducidas.
+
+!En el ISP aún no se coloca la ruta por default, no se puede
+!probar todavía.
+
+!8.) Traduzca las PCs de la VLAN de Ingeniería usando NAT usando las primeras 15 direcciones compradas. Y como es de la 1 a la 15 de la dirección 
+!200.10.10.0 /27 es la mitad de esa subred, por lo que se va a convertir de /27 a /28.
+
+!Hay que definir el tráfico a traducir a través de una lista de acceso. 
+!Primero hay que definir las direcciones que serán traducidas.
+
+!1. Definir un pool de direcciones globales (públicas) que serán asignadas 
+!cuando sean necesarias.
+!  ip nat pool Nombre dirIP-inicial dirIP-final netmask MáscaraSubneteo
+!2. Definir una ACL estándar (defino las direcciones IP privadas que tienen permiso a ser traducidas):
+!access-list Número permit dirIP-inicial WildMask_ACL
+!3. Establecer la traducción de direcciones utilizando:
+! Una lista de control de acceso.
+! Una dirección IP de traducción estática.
+
+ip nat pool NAT 200.10.10.1 200.10.10.15 netmask 255.255.255.240
+ip nat inside source list 1 pool NAT
+access-list 1 permit 192.168.10.0 0.0.0.255
+
+!Definir una ACL estándar (defino las direcciones IP privadas que tienen 
+!permiso a ser traducidas):
+!En la lista de acceso se indica el tráfico a ser traducido
+access-list 1 permit 192.168.10.0 0.0.0.255
+
+!Establecer la traducción de direcciones utilizando:
+!Una lista de control de acceso.
+!Una dirección IP de traducción estática.
+
+ip nat inside source { list {Número | Nombre} pool NOMBRE [overload] | static IP-local IP-Global }
+
+
+
+----------------------------------------------
+ROUTER ISP
+----------------------------------------------
+en
+config t
+
+hostname ISP
+
+int s0/0/1
+ip address 200.10.10.30 255.255.255.252
+no shut
+
+int g0/0
+ip address 209.165.200.229 255.255.255.252
+no shut
+
+! Ahora hay que sumarizar la red 200.10.10.28 con las direcciones
+! públicas de NAT asignadas para la traducción 
+! 200.10.10.1 - .15 /28 (200.10.10.0/28) y la ip del servidor 200.10.10.20
+! Como podemos sumarizar, que equipos tendrían salida hacia Internet
+! El web server y la red de ingeniería podría salir hacia Internet.
+
+! Esta ruta la agregaría en el ISP para que devuelva el tráfico desde Internet
+! hacia r1 y hacia el servidor web 
+ip route 200.10.10.0 255.255.255.224 s0/0/1
+
+Sumarizamos las direcciones públicas, la dirección del servidor y la
+dirección directamente conectada.
+
+200.10.10.000 1 1100  255.255.255.252  200.10.10.28
+200.10.10.000 1 0100  255.255.255.224  200.10.10.20 Servidor
+200.10.10.000 0 0000  255.255.255.224  200.10.10.0  Direcciones públicas
+------------------------------------
+200.10.10.000 0 0000  255.255.255.224  red sumarizada.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

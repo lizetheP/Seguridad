@@ -1,0 +1,29 @@
+OSP
+
+router ospf 1-65535
+
+RA
+router ospf 1
+network 172.16.0.0 0.0.0.255 area 0
+network 222.10.30.244 0.0.0.3 area 0
+network 172.18.0.0 0.0.0.255 area 0
+passive-interface g0/0/0
+
+
+RFrontera
+
+ip route 0.0.0.0 0.0.0.0 s0/1/0
+
+default-information originate
+
+
+ISP
+ip route 172.16.0.0 255.255.255.0 s0/1/0
+
+
+
+
+255.255.255.255
+255.255.255.0
+---------------
+0. 0.0.255

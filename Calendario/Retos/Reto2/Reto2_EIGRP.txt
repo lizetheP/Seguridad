@@ -1,0 +1,111 @@
+
+-------- ROeste -------
+enable
+config t
+
+hostname ROeste
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 7
+password cisco
+login
+
+enable password class 
+
+int S0/0/0
+ip address 168.1.25.218 255.255.255.252
+no shut
+
+int f0/0
+ip address 132.254.89.65 255.255.255.192
+no shut
+
+router eigrp 1
+network 132.254.0.0
+network 168.1.0.0
+passive-interface f0/0
+no auto-summary
+
+-------- RFrontera -------
+enable
+config t
+
+hostname RFrontera
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 7
+password cisco
+login
+
+enable password class 
+
+int S0/1/0
+ip address 168.1.25.217 255.255.255.252
+clock rate 128000
+no shut
+
+int S0/1/1
+ip address 168.1.25.249 255.255.255.252
+clock rate 128000
+no shut
+
+int S0/0/0
+ip address 221.10.10.162 255.255.255.224
+no shut
+
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+router eigrp 1
+network 168.1.0.0
+passive-interface s0/0/0
+redistribute static
+no auto-summary
+
+
+-------- REste ----------
+enable
+config t
+
+hostname REste
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 7
+password cisco
+login
+
+enable password class 
+
+int S0/0/0
+ip address 168.1.25.250 255.255.255.252
+no shut
+
+int f0/1
+ip address 132.48.254.97 255.255.255.224
+no shut
+
+router eigrp 1
+network 132.48.0.0
+network 168.1.0.0
+passive-interface f0/1
+no auto-summary

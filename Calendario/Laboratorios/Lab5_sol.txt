@@ -1,0 +1,142 @@
+
+-------- RA -------
+enable
+config t
+
+hostname RA
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class 
+
+int S0/1/1
+ip address 222.10.30.246 255.255.255.252
+no shut
+
+int g0/0/0
+ip address 172.16.0.254 255.255.255.0
+no shut
+
+int Lo0
+ip address 172.18.0.1 255.255.255.0
+no shut
+
+router ospf 1
+network 172.16.0.0 0.0.0.255 area 0 
+! 255.255.255.255 - 255.255.255.0 = 0.0.0.255
+network 222.10.30.244 0.0.0.3 area 0
+! 255.255.255.255 - 255.255.255.252 = 0.0.0.3
+passive-interface g0/0/0
+
+router ospf 1
+network 172.16.0.0 0.0.0.255 area 0 
+network 222.10.30.244 0.0.0.3 area 0
+network 172.18.0.0 0.0.0.255 area 0
+passive-interface g0/0/0
+passive-interface Lo0
+
+
+-------- RFrontera -------
+enable
+config t
+
+hostname RFrontera
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class 
+
+int S0/1/0
+ip address 132.254.89.34 255.255.255.252
+no shut
+
+int S0/1/1
+ip address 222.10.30.245 255.255.255.252
+clock rate 128000
+no shut
+
+int g0/0/0
+ip address 172.20.0.254 255.255.255.0
+no shut
+
+int Lo0
+ip address 172.22.0.1 255.255.255.0
+no shut
+
+ip route 0.0.0.0 0.0.0.0 s0/1/0
+
+router ospf 2
+network 172.20.0.0 0.0.0.255 area 0 
+network 222.10.30.244 0.0.0.3 area 0
+network 172.22.0.0 0.0.0.255 area 0
+passive-interface s0/1/0
+passive-interface g0/0/0
+passive-interface Lo0
+default-information originate
+
+-------- ISP ----------
+enable
+config t
+
+hostname ISP
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class 
+
+int S0/1/0
+ip address 132.254.89.33 255.255.255.252
+clock rate 128000
+no shut
+
+int g0/0/0
+ip address 129.10.10.254 255.255.255.0
+no shut
+
+int Lo0
+ip address 129.10.100.1 255.255.255.0
+no shut
+
+router ospf 3
+network 129.10.10.0 0.0.0.255 area 0
+network 129.10.100.0 0.0.0.255 area 0 
+network 132.254.89.32 0.0.0.3 area 0
+passive-interface g0/0
+passive-interface Lo0
+
+ip route 172.16.0.0 255.255.255.0 s0/1/0
+ip route 172.18.0.0 255.255.255.0 s0/1/0
+ip route 172.20.0.0 255.255.255.0 s0/1/0
+ip route 172.22.0.0 255.255.255.0 s0/1/0
+ip route 222.10.30.244 255.255.255.252 s0/1/0
+

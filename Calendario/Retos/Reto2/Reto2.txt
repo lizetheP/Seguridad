@@ -1,0 +1,57 @@
+
+-------- R1 -------
+enable
+config t
+
+hostname R1
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class 
+
+int S0/0/0
+ip address 209.165.200.226 255.255.255.252
+no shut
+
+int g0/0
+ip address 191.168.200.254 255.255.255.0
+no shut
+
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+
+-------- SW-Taqueria ----------
+enable
+config t
+
+hostname SW-Taqueria
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class 
+
+int vlan 1
+ip address 191.168.200.253 255.255.255.0
+no shut
+
+ip default-gateway 191.168.200.254

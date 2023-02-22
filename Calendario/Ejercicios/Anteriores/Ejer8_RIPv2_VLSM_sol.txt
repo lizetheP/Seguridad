@@ -1,0 +1,211 @@
+------------- ISP ----------------
+........ Ya configurado ........
+
+
+---------- Router Frontera ---------
+enable
+config t
+no ip domain-lookup
+
+hostname RFrontera
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync 
+! CUANDO ESTOY EDITANDO SI SE MUESTRA UN MENSAJE DE CONSOLA, 
+! ME PERMITA CONTINUAR CON MI CONFIGURACIÓN.
+
+! CONEXION REMOTA VIA TELNET
+line vty 0 4
+password cisco 
+login
+
+int s0/0/0
+desc INTERFAZ QUE CONECTA CON EL ISP
+ip address 209.89.100.242  255.255.255.252
+no shut
+
+int s0/0/1
+ip address 192.168.255.245  255.255.255.252
+clock rate 128000
+no shut
+
+int f0/0
+ip address 192.168.1.254  255.255.255.0
+no shut
+
+router rip
+ver 2
+network 192.168.1.0
+network 192.168.255.0
+passive-interface fa0/0
+passive-interface s0/0/0
+default-information originate
+no auto-summary
+
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+
+
+-------- Router A ---------
+enable
+config t
+hostname RA
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int s0/0/0
+ip address 192.168.255.249  255.255.255.252
+clock rate 128000
+no shut
+
+int s0/0/1
+ip address 192.168.255.246  255.255.255.252
+no shut
+
+int f0/0
+ip address 192.168.3.254 255.255.255.0 
+no shut
+
+router rip
+ver 2
+network 192.168.255.0
+network 192.168.3.0
+passive-interface fa0/0
+no auto-summary
+
+-------- Router B ---------
+enable
+config t
+hostname RB
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int s0/0/0
+ip address 192.168.255.250 255.255.255.252
+no shut
+
+int f0/0
+ip address 192.168.2.126 255.255.255.128  
+no shut
+
+int f0/1
+ip address 192.168.2.190 255.255.255.192 
+no shut
+
+router rip
+ver 2
+network 192.168.2.0
+network 192.168.255.0
+passive-interface fa0/0
+passive-interface fa0/1
+no auto-summary
+
+-------- Switch 1 ---------
+enable
+config t
+hostname S1
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address  192.168.2.189   255.255.255.192
+no shut
+
+ip  default-gateway  192.168.2.190
+
+-------- Switch 2 ---------
+enable
+config t
+hostname S2
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address  192.168.2.125  255.255.255.128
+no shut
+
+ip  default-gateway  192.168.2.126
+
+-------- Switch 3 ---------
+enable
+config t
+hostname S3
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address  192.168.3.253  255.255.255.0
+no shut
+
+ip  default-gateway  192.168.3.254
+
+-------- Switch 4 ---------
+enable
+config t
+hostname S4
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address  192.168.1.253  255.255.255.0
+no shut
+
+ip  default-gateway  192.168.1.254
+

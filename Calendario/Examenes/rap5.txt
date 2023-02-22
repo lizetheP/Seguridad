@@ -1,0 +1,62 @@
+LISTAS DE ACCESO ESTANDAR
+access-list número_lista {permit | deny}
+
+LISTAS DE ACCESO EXTENDIDAS
+access-list número_lista {permit | deny} protocolo ip_origen wildcard_origen ip_destino wildcard_destino operando número_puerto
+
+Asignación de la lista de control de acceso a una interfaz del ruteador:
+
+interface int_número
+ip access-group	número_lista {in | out}
+
+a) Diseña una lista de control de acceso estándar que impida que las 
+computadoras de la subred de Teams e Invitados tengan acceso a la sección 
+de Jueces.
+router(config)# access-list 10 deny 132.254.89.0 0.0.0.127
+router(config)# access-list 10 deny 132.254.89.192 0.0.0.31
+router(config)# access-list 10 permit any
+(20 puntos)
+
+¿En qué router asignarás esta lista de control de acceso? RConcurso
+
+router(config)# interface g0/0 (2 puntos)
+router(config-if)#ip access-group [E] (2 puntos)
+
+b) Diseña una lista de control de acceso extendida que impida todo tipo de tráfico que se dirige al servidor OMI.com.mx y que sale desde cualquier IP asociada con la subred de los Teams. El resto del tráfico debe pasar libremente.
+
+router(config)# [F]
+router(config)# [G]
+router(config)# [H]
+
+(20 puntos)
+
+¿En qué router asignarás esta lista de control de acceso? [I] (1 punto)
+
+router(config)# interface [J] (2 puntos)
+router(config-if)#[K] (2 puntos)
+
+c) Diseña una lista de control de acceso extendida para impedir que las computadoras de la subred de Teams tengan acceso al servidor de ACM vía el protocolo WEB, pero que el resto del tráfico pase libremente (FTP, Telnet, ping, etc.). En esta lista de control de acceso todas las direcciones IP del resto de las subredes internas e IPs del exterior, pueden acceder sin restricción a todos los servicios instalados en la subred de servidores. El protocolo WEB utiliza el puerto 80 del protocolo TCP.
+
+router(config)#[L]
+router(config)#[M]
+router(config)#[N]
+
+(20 puntos)
+
+¿En qué router asignarás esta lista de control de acceso?[O] (1 punto)
+
+router(config)# interface [P] (2 puntos)
+router(config-if)# [Q] (2 puntos)
+
+d) Diseña una lista de control de acceso extendida que sólo vía el protocolo WEB permita acceder desde las IP’s del exterior al servidor del Score Board. El resto del tráfico al igual que el acceso a los otros servidores no está permitido. El servidor del Score Board utiliza el puerto 80 del protocolo TCP y está ubicado en la dirección IP 132.254.89.129.
+
+router(config)#[R]
+router(config)#[S]
+router(config)#[T]
+
+(20 puntos)
+
+¿En qué router asignarás esta lista de control de acceso? [U] (1 punto)
+
+router(config)# interface [V] (2 puntos)
+router(config-if)#[W] (2 puntos)

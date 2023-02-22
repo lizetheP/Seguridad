@@ -1,0 +1,63 @@
+! ==========================
+! ====== RGuadalajara ======
+! ==========================
+
+ena
+config t
+hostname RGuadalajara
+
+no ip domain-lookup
+
+! Interface to IZZI ISP
+int s0/0/0
+ip address 187.246.4.2 255.255.255.252
+ip nat outside
+no shut
+
+
+! Interface to Swimming Pool
+int s0/1/0
+ip address 172.30.0.249 255.255.255.252
+clock rate 128000
+ip nat inside
+no shut
+
+! Interface to Switch
+int g0/0
+ip address 172.30.0.1 255.255.255.128
+ip nat inside
+no shut
+
+
+! DHCP Exceptions
+ip dhcp excluded-address 172.30.0.1
+ip dhcp excluded-address 172.30.0.129
+
+
+! **** DHCP Pools ****
+! DHCP Alberca
+ip dhcp pool PoolDHCP-Alberca-G00
+network 172.30.0.128 255.255.255.192
+default-router 172.30.0.129
+
+! DHCP Residencia
+ip dhcp pool PoolDHCP-Casa-G00
+network 172.30.0.0 255.255.255.128
+default-router 172.30.0.1
+
+
+! **** Nat Pool ****
+ip nat pool GdaPool 187.246.4.2 187.246.4.2 netmask 255.255.255.252
+access-list 10 permit 172.30.0.0 0.0.0.255
+ip nat inside source list 10 pool GdaPool overload
+
+
+! **** OSPF ****
+router ospf 400
+default-info originate
+network 172.30.0.248 0.0.0.3 area 0
+network 172.30.0.0 0.0.0.127 area 0
+passive-interface s0/0/0
+
+! Redirect unknown address to IZZI
+ip route 0.0.0.0 0.0.0.0 s0/0/0

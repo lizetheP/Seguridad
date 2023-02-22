@@ -1,0 +1,40 @@
+permit tcp 172.20.128 0.0.0.63 172.20.0.224 0.0.0.15 eq 22
+permit tcp 172.20.128 0.0.0.63 172.20.0.224 0.0.0.15 eq 22
+
+permit tcp 172.20.128 0.0.0.63 172.20.0.224 0.0.0.15 eq 22
+permit tcp 172.20.0.128 0.0.0.63 172.20.0.224 0.0.0.15 eq 22
+
+permit tcp any host 172.20.0.226 eq 80 Hay un espacio al final. corregir
+permit tcp any host 172.20.0.226 eq 80
+
+RB
+---
+ip dhcp excluded-address 132.254.89.237 132.54.89.238
+
+ip dhcp pool Profesores
+network 132.254.89.232 255.255.255.248
+default-router 132.254.89.237
+
+RA
+------------
+ip dhcp excluded-address 132.54.89.221 132.54.89.222
+
+ip dhcp pool Directores
+network 132.254.89.192 255.255.255.224
+default-router 132.254.89.222
+
+ip helper-address 132.254.89.237
+                  132.254.89.126
+                  132.254.89.245
+                  132.254.89.242
+
+
+
+
+
+
+
+
+
+
+default-router 132.54.89.222

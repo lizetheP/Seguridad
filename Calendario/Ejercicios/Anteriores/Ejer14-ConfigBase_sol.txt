@@ -1,0 +1,204 @@
+! 1. Configurar la IP s0/0/0 del router frontera
+! 2. Configurar las VLANs
+!     2.1 Configurar las interfaces del RFrontera 
+!         Configurar las interfaces con la última dirección válida
+!         de la subred
+!     2.3 Crear las VLANs con nombre y rango en Switch SCompany
+! 3. Configurar el DHCP solo para el grupo de Users obtiene dirección IP dinámica(DHCP)
+!     Configurar DHCP solo para la subred de Users
+! 4. Configurar NAT.
+      4.1 Configurar un nat estático para la WEBcam y el ServerLocal
+      4.2 Configurar el pool de direcciones públicas 65.100.255.128 / 29
+                     255.255.255.248    256 - 248 = 8
+                     .128 + 8 = 136  = 
+              65.100.255.128 - 135
+              Ya se utilizaron .135 y .134 para nat estático
+              El rango que me queda es .128 -.133
+
+s direcciones fijas de los equipos.     
+!     4.1 Configurar el nombre del pool con las direcciones públicas a utilizar para 
+!         realizar las traducciones.
+!     4.2 Configurar la lista de control de acceso estándar donde se indica todas las
+!         direcciones que van a poder participar en esa traducción
+!     4.3 Viene la asociación dependiendo el tipo de nateo (lista o estático)
+!     4.4 Definir cual es la acción a realizar en cada una de las interfaces 
+!         cuando tengamos el servicio de NAT instalado 
+!         inside -> Para todas las direcciones privadas que participan en el nateo
+!         outside -> Es la que tiene conexión con el servidor, en este caso el ISP
+! =====================
+! ======== ISP ========
+! =====================
+
+  Ya configurado
+
+! ===========================
+! ======== RFrontera ==========
+! ===========================
+
+ena
+config t
+hostname RFrontera
+no ip domain-lookup
+
+int s0/0/0
+desc Interfaz que conecta con ISP
+ip address 65.255.255.253 255.255.255.252
+ip nat outside
+no shut
+
+! Declaración de subinterfaces.
+! Manager VLAN 10
+int g0/0.10
+description VLAN Manager
+encapsulation dot1Q 10
+ip address 192.168.0.142 255.255.255.240
+ip nat inside
+! 192.168.0.128/28 128+16 = 144 = 142
+
+! Users VLAN 20
+int g0/0.20
+description VLAN Users
+encapsulation dot1Q 20
+ip address 192.168.0.126 255.255.255.128
+ip nat inside
+
+! Services VLAN 30
+int g0/0.30
+description VLAN Services
+encapsulation dot1Q 30
+ip address 192.168.0.150 255.255.255.248
+ip nat inside
+! .144/ 29 .144 255.255.255.248 256-248 = 8 144+8=152
+
+int g0/0
+no shut
+
+! DHCP Exceptions
+ip dhcp excluded-address 192.168.0.126
+
+! DHCP Pool
+ip dhcp pool Users
+network 192.168.0.0 255.255.255.128
+default-router 192.168.0.126
+
+! NAT estático (WEBcam y ServerLocal)
+ip nat inside source static 192.168.0.130 65.100.255.135
+ip nat inside source static 192.168.0.145 65.100.255.134
+
+ip nat pool MyPool 65.100.255.128 65.100.255.133 netmask 255.255.255.248
+
+! 65.100.255.128 Es un grupo de direcciones todas se usan
+! Es un grupo de direcciones IP, no es una subred lo que estamos recibiendo
+! El pool se puede utilizar en su totalidad
+! 256-248 = 8 .128 + 8 = 136   Rango .128 - .135 Ya utilizadas.134 y .135
+! Rango iría de .128 - .133 Solamente tendríamos 6 direcciones.
+
+! Definir quién puede acceder al NAT dinámico
+access-list 1 permit 192.168.0.0 0.0.0.255
+!access-list 1 permit any es lo mismo 
+! Definir los equipos que van a salir al exterior, todos los equipos de las tres
+! subredes pueden salir al exterior.
+! Access list estándard 1 - 99 
+! Máscara comodín
+    
+
+! Declarar el NAT o PAT dinámico
+ip nat inside source list 1 pool MyPool overload
+! si le quito el overload es NAT uno a uno
+! si dejo overload es PAT muchas direcciones ip privadas, van a poder utilizar
+! la misma dirección ip pública para salir al exterior
+
+! Establecer una ruta por default que se encargue de sacar el tráfico a Internet
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+
+! ====================
+! ===== SCompany ======
+! ====================
+
+ena
+conf t
+hostname SCompany
+
+! Creación de la base de datos de las VLANs
+vlan 10
+name Manager
+exit
+
+vlan 20
+name Users
+exit
+
+vlan 30
+name Services
+exit
+
+!vlan 1 que es la nativa, está creada siempre por default, no la vamos a configurar.
+! Solamente la configuraríamos si queremos acceder al switch por telnet, ping o ssh
+
+! Definición de los puertos de acceso y relación a que VLAN 10
+int range f0/1-6
+switchport mode access
+switchport access vlan 10
+
+int range f0/7-19
+switchport mode access
+switchport access vlan 20
+
+int range f0/20-24
+switchport mode access
+switchport access vlan 30
+
+! Definición de puertos trunk G0/1
+int g0/1
+switchport mode trunk
+no shut
+
+! ====================
+! ====== SUsers =======
+! ====================
+! El switch SUsers ha sido puesto como una extensión
+! Si del 7 al 19 hay 12 puertos disponibles, entonces puedo poner 12 x 24 voy a 
+! tener el número total de dispositivos a conectar. El switch SUsers es un cliente
+! mas que te permite extender el dominio para que más usuarios se puedan 
+! conectar.
+! SUsers es una extensión de la VLAN 20 y debe incluir en su base de datos como 
+! mínimo a que VLAN pertenece o se va a comunicar, no
+! debe tener el resto de las VLANs, pero si con la que está participando
+ena
+conf t
+hostname SUsers01
+
+vlan 20
+name Users
+
+! Users
+int range f0/1-24
+switchport mode access
+switchport access vlan 20
+
+---------------------
+ena
+conf t
+hostname SUsers02
+
+vlan 20
+name Users
+
+! Users
+int range f0/1-24
+switchport mode access
+switchport access vlan 20
+
+---------------------
+ena
+conf t
+hostname SUsers03
+
+vlan 20
+name Users
+
+! Users
+int range f0/1-24
+switchport mode access
+switchport access vlan 20

@@ -1,0 +1,16 @@
+
+Why is the protocol down, even though you issued the no shutdown 
+command for interface VLAN 99?
+No se han asignado puertos físicos en el switch a la VLAN 99.
+
+What prompt was displayed on S1? Why?
+S1 muestra el prompt en el modo EXEC privilegiado porque se usó la opción 
+de privilegio 15 al configurar el nombre de usuario y la contraseña
+
+1. ¿Por qué habilitaría la seguridad de puertos en un conmutador?
+Ayudaría a evitar que dispositivos no autorizados accedan a su red si se conectan a un 
+switch de su red.
+2. ¿Por qué deben deshabilitarse los puertos no utilizados en un conmutador?
+2.	Why should unused ports on a switch be disabled?
+Una excelente razón es que un usuario no puede conectar un dispositivo al switch
+en un puerto no utilizado y acceder a la LAN.

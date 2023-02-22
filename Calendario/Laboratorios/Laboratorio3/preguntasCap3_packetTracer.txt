@@ -1,0 +1,6 @@
+¿Por qué los pings de PC0 a Server0 no se realizan de manera satisfactoria?
+La ruta estática a la red 192.168.2.0 está mal configurada en el Router1.​​​
+
+¿Qué ruta estática IPv6 se puede configurar en el router R1 para obtener una red completamente convergente?
+ipv6 route 2001:db8:10:12::/64 S0/0/1
+
