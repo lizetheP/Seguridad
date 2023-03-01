@@ -1,0 +1,33 @@
+-------- ISP -------
+enable
+config t
+
+hostname ISP
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class 
+
+int S0/0/0
+ip address 209.165.200.225 255.255.255.252
+no shut
+
+int Lo0
+ip address 132.254.89.1 255.255.255.0
+no shut
+
+int Lo1
+ip address 65.0.0.1 255.255.255.0
+no shut
+
+! CONFIGURAR RUTA ESTÁTICA HACIA SUBRED AMARILLA

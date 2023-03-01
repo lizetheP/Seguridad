@@ -1,0 +1,53 @@
+! ==========================
+! ====== RGuadalajara ======
+! ==========================
+
+ena
+config t
+hostname RGuadalajara
+
+no ip domain-lookup
+
+
+! Interface to Swimming Pool
+int s0/1/0
+ip address 172.30.0.249 255.255.255.252
+clock rate 128000
+ip nat inside
+no shut
+
+! Interface to Switch de la Residencia
+int g0/0
+ip address 172.30.0.1 255.255.255.128
+ip nat inside
+no shut
+
+! Interface al router Querétaro
+int g0/1
+ip address 172.30.0.253 255.255.255.252
+ip nat inside
+no shut
+
+! DHCP Exceptions
+ip dhcp excluded-address 172.30.0.1
+ip dhcp excluded-address 172.30.0.129
+
+! **** DHCP Pools ****
+! DHCP Alberca
+ip dhcp pool PoolDHCP-Alberca-G00
+network 172.30.0.128 255.255.255.192
+default-router 172.30.0.129
+
+! DHCP Residencia
+ip dhcp pool PoolDHCP-Casa-G00
+network 172.30.0.0 255.255.255.128
+default-router 172.30.0.1
+
+! **** OSPF ****
+router ospf 400
+network 172.30.0.248 0.0.0.3 area 0
+network 172.30.0.252 0.0.0.3 area 0
+! SE AGREGA SUBRED ROSA
+network 172.30.0.0 0.0.0.127 area 0
+passive-interface g0/0
+

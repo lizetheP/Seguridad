@@ -1,0 +1,78 @@
+----------- ISP -----------
+  Ya configurado
+
+---------- Router Frontera ---------
+enable
+config t
+hostname FRONTERA
+
+no ip domain-lookup
+
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int s0/0/0
+ip address 172.17.0.241 255.255.255.252
+clock rate 128000
+no shut
+
+int s0/0/1
+ip address 
+no shut
+
+int g0/0
+ip address 172.16.0.126 255.255.255.128
+no shut
+
+ip dhcp pool RFG00
+network 
+default-router 
+
+
+-------- Router Rectoria ---------
+
+enable
+config t
+hostname RECTORIA
+
+no ip domain-lookup
+
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int s0/0/0
+ip address 172.17.0.242 255.255.255.252
+no shut
+
+int g0/0
+ip address 172.17.0.190 255.255.255.192
+no shut
+
+int g0/1
+ip address 172.17.0.126 255.255.255.128
+no shut
+
+ip dhcp pool RRectoriaG00
+network 
+default-router 
+
+ip dhcp pool RRectoriaG01
+network 
+default-router
+

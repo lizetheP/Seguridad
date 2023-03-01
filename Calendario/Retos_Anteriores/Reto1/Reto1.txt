@@ -1,0 +1,40 @@
+--------- ISP --------
+enable
+config t
+
+hostname ISP 
+
+service password-enc
+
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+logging sync
+
+enable password class
+
+int S0/0/0
+desc  Interfaz que se conecta con R1
+ip address 209.165.200.225 255.255.255.252
+no shut
+
+int Lo0
+desc  Interfaz Lo0
+ip address 132.254.89.1 255.255.255.0
+no shut
+
+int Lo1
+desc  Interfaz Lo1
+ip address 65.0.0.1 255.255.255.0
+no shut
+
+! RUTA ESTATICA DIRECTAMENTE CONECTADA HACIA SUBRED
+! AMARILLA
+ip route 200.40.10.0 255.255.255.0 s0/0/0

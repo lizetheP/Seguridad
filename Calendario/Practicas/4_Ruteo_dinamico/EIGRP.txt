@@ -111,6 +111,13 @@ network 10.2.2.0 0.0.0.3
 no auto-summary
 passive-interface g0/0
 
+int s0/0/0
+bandwidth 2000
+exit
+
+int s0/0/1
+bandwidth 2000
+exit
 ----------------------------------------------
 ROUTER R3
 ----------------------------------------------
@@ -156,5 +163,11 @@ network 10.2.2.0 0.0.0.3
 no auto-summary
 passive-interface g0/0
 
+int s0/0/0
+bandwidth 64
+exit
 
+int s0/0/1
+bandwidth 2000
+exit
 

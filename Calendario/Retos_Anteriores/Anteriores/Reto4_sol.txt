@@ -1,0 +1,89 @@
+
+---------------------------------------------------
+Lista de acceso 1 estandar
+
+1.Diseña una lista de control de acceso estándar que impida que las computadoras de la 
+subred de Alumnos tengan acceso a la subred de Directores.
+
+Router A
+
+access-list 10 deny 132.254.89.0 0.0.0.127
+access-list 10 permit any
+
+int g0/0
+ip access-group 10 out
+
+---------------------------------------------------
+Lista de acceso 2 estándar
+
+b. Diseña una lista de control de acceso estándar para impedir que 
+las computadoras de la subred de Alumnos tengan acceso a la 
+subred de Profesores.
+
+Router B
+
+access-list 20 deny 132.254.89.0 0.0.0.127
+access-list 20 permit any
+
+int g0/0
+ip access-group 20 out
+
+---------------------------------------------------
+Lista de acceso 3 extendida
+
+3.Diseña una lista de control de acceso extendida 
+que impida que las computadoras de la subred de Alumnos, 
+Profesores y Directores tengan acceso externo a los 
+servicios de WEB del servidor LOL.com. 
+El resto de las direcciones IP pueden acceder sin 
+restricción a todos los servicios de Internet 
+incluyendo todo el tráfico que no sea WEB y 
+se dirija al servidor de LOL.com
+
+Router B
+access-list 110 deny tcp 132.254.89.0 0.0.0.127 host 111.65.32.1 eq 80
+access-list 110 deny tcp 132.254.89.232 0.0.0.7 host 111.65.32.1 eq 80
+access-list 110 deny tcp 132.254.89.192 0.0.0.31 host 111.65.32.1 eq 80
+access-list 110 permit ip any any 
+
+int s0/0/0
+ip access-group 110 out
+---------------------------------------------------
+
+Lista de acceso 4 extendida
+
+4. Diseña una lista de control de acceso extendida que únicamente permita el 
+acceso vía FTP al servidor Murillo desde cualquier IP asociada con la subred de 
+los profesores y de los Directores pero que impida el acceso a este 
+servidor vía FTP desde la subred de los Alumnos. 
+El resto del tráfico pasa libremente (WEB, SMTP, icmp, etc.).
+
+Router A
+access-list 120 deny tcp 132.254.89.0 0.0.0.127 host 132.254.89.130 eq 20
+access-list 120 deny tcp 132.254.89.0 0.0.0.127 host 132.254.89.130 eq 21
+access-list 120 permit tcp 132.254.89.232 0.0.0.7 host 132.254.89.130 eq 20
+access-list 120 permit tcp 132.254.89.232 0.0.0.7 host 132.254.89.130 eq 21
+access-list 120 permit tcp 132.254.89.192 0.0.0.31 host 132.254.89.130 eq 20
+access-list 120 permit tcp 132.254.89.192 0.0.0.31 host 132.254.89.130 eq 21
+access-list 120 permit ip any any
+
+int g0/1
+ip access-group 120 out
+
+---------------------------------------------------
+Lista de acceso 5
+
+5.Diseña una lista de control de acceso extendida que únicamente permita el acceso al 
+servidor Finanzas desde cualquier IP asociada con la subred de los Alumnos y de los Directores 
+pero que impida el acceso a este servidor desde otras direcciones IP. 
+En está ocasión el servidor de Finanzas al no permitir ningún tipo de tráfico desde 
+direcciones diferentes de Alumnos y Directivos dará la impresión de que no existe
+
+Router A
+access-list 130 permit ip 132.254.89.0 0.0.0.127 host 132.254.89.129
+access-list 130 permit ip 132.254.89.192 0.0.0.31 host 132.254.89.129
+access-list 130 deny ip any any
+
+int g0/1
+ip access-group 130 out
+
