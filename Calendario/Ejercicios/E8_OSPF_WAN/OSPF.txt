@@ -1,0 +1,101 @@
+---------------------------------------------
+ROUTER R1
+---------------------------------------------
+en
+config t
+
+hostname R1
+
+interface GigabitEthernet0/0
+description Link to LAN 1
+ip address 192.168.1.1 255.255.255.0
+no shut
+
+interface Serial0/0/0
+description Link to R2
+ip address 192.168.12.1 255.255.255.252
+clock rate 128000
+no shut
+
+interface Serial0/0/1
+description Link to R3
+ip address 192.168.13.1 255.255.255.252
+no shut
+
+banner motd # Solo acceso autorizado #
+
+router ospf 1
+network 192.168.1.0 0.0.0.255 area 0
+network 192.168.12.0 0.0.0.3 area 0
+network 192.168.13.0 0.0.0.3 area 0
+passive-interface g0/0
+
+255.255.255.255
+255.255.255.0
+-----------------
+---------------------------------------------
+ROUTER R2
+---------------------------------------------
+en
+config t
+
+hostname R2
+
+interface GigabitEthernet0/0
+description Link to LAN 2
+ip address 192.168.2.1 255.255.255.0
+no shut
+
+interface Serial0/0/0
+description Link to R1
+ip address 192.168.12.2 255.255.255.252
+no shut
+
+interface Serial0/0/1
+description Link to R3
+ip address 192.168.23.1 255.255.255.252
+clock rate 128000
+no shut
+
+banner motd # Solo acceso autorizado #
+
+router ospf 1
+network 192.168.2.0 0.0.0.255 area 0
+network 192.168.12.0 0.0.0.3 area 0
+network 192.168.23.0 0.0.0.3 area 0
+passive-interface g0/0
+
+---------------------------------------------
+ROUTER R3
+---------------------------------------------
+
+en
+config t
+
+hostname R3
+
+interface GigabitEthernet0/0
+description Link to LAN 3
+ip address 192.168.3.1 255.255.255.0
+no shut
+
+interface Serial0/0/0
+description Link to R1
+ip address 192.168.13.2 255.255.255.252
+clock rate 128000
+no shut
+
+interface Serial0/0/1
+description Link to R2
+ip address 192.168.23.2 255.255.255.252
+no shut
+
+banner motd # Solo acceso autorizado #
+
+router ospf 1
+network 192.168.3.0 0.0.0.255 area 0
+network 192.168.23.0 0.0.0.3 area 0
+network 192.168.13.0 0.0.0.3 area 0
+passive-interface g0/0
+
+
