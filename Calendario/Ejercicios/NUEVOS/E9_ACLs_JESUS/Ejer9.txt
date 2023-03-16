@@ -1,0 +1,21 @@
+1. Se permite el tráfico de Telnet desde los dispositivos 
+de la red 10.101.117.32/28 hasta los dispositivos en 
+las redes 10.101.117.0/27. 
+Utiliza el número de lista 199 para la ACL extendida.
+
+access-list 199 permit tcp 10.101.117.32 0.0.0.15 10.101.117.0 0.0.0.31 eq telnet.
+
+2. Se permite el tráfico ICMP desde cualquier origen hasta 
+cualquier destino. Utilice el mismo número de lista de acceso 
+para permitir todo el tráfico ICMP, independientemente de la 
+dirección de origen o de destino. 
+NOTA: Utilice las palabras clave any.
+
+access-list 199 permit icmp any any
+
+Se permite ICMP, y se necesita una segunda instrucción de ACL. 
+Utilice el mismo número de lista de acceso para permitir todo el 
+tráfico ICMP, independientemente de la dirección de origen o 
+de destino. ¿Cuál es la segunda instrucción de ACL? 
+(Sugerencia: utilice las palabras clave any).
+access-list 199 permit icmp any any

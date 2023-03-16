@@ -1,0 +1,41 @@
+Mejores prácticas "Migración direccionamiento IP estático a IP dinámico (DHCP)"
+
+1. Verificar que tenemos conectividad entre todos los elementos de la red 
+   LAN y de la LAN hacia Internet.
+2. Identificar las subredes involucradas para poder asignar el servicio 
+   de DHCP.
+3. Para cada segmento de red (VLANs) hay que identificar la IP asociada 
+   con esa subinterface. 
+   * Esta dirección IP será la puerta de enlace predeterminada para cada DHCP.
+   * Asociar cada subred con su máscara de subred.
+   * Identificar las IPs a excluir del pool de DHCP.
+4. Diseñar y configurar el pool de DHCP. 
+5. Obtener IP dinámica en cada dispositivo terminal.
+6. Probar conectividad interna y externa.
+
+Configuración (Información básica)
+Bloque amarillo : Home Office
+192.168.10.0 255.255.255.128
+default-router 192.168.10.126
+
+Bloque entretenimiento  : Entretenimiento
+192.168.10.128 255.255.255.192
+default-router 192.168.10.190
+
+! Vamos a crear el pool para la subred de homeOffice
+! DHCP para la subred de HomeOffice
+
+ip dhcp excluded-address 192.168.10.1 192.168.10.4
+ip dhcp excluded-address 192.168.10.126
+! Si las direcciones no son consecutivas tendría
+! que poner cuatro exclusiones.
+
+ip dhcp pool HomeOffice
+network 192.168.10.0 255.255.255.128
+default-router 192.168.10.126
+
+! DHCP para la subred de Entretenimiento
+ip dhcp excluded-address 192.168.10.190
+ip dhcp pool Entretenimiento
+network 192.168.10.128 255.255.255.192
+default-router 192.168.10.190

@@ -1,0 +1,199 @@
+
+-------- ROeste -------
+enable
+config t
+
+hostname ROeste
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 7
+password cisco
+login
+
+enable password class 
+
+int S0/0/0
+ip address 170.2.5.242 255.255.255.252
+no shut
+
+int f0/0
+ip address 140.5.8.65 255.255.255.192
+no shut
+
+router ospf 1
+network 140.5.8.64 0.0.0.63 area 0 
+network 170.2.5.240 0.0.0.3 area 0
+passive-interface f0/0
+
+
+-------- RFrontera -------
+enable
+config t
+
+hostname RFrontera
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 7
+password cisco
+login
+
+enable password class 
+
+int S0/1/0
+ip address 170.2.5.241 255.255.255.252
+clock rate 128000
+no shut
+
+int S0/1/1
+ip address 170.2.5.249 255.255.255.252
+clock rate 128000
+no shut
+
+int S0/0/0
+ip address 221.10.10.162 255.255.255.224
+no shut
+
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+router ospf 2
+network 170.2.5.240 0.0.0.3 area 0
+network 170.2.5.248 0.0.0.3 area 0
+passive-interface s0/0/0
+default-information originate
+
+-------- REste ----------
+enable
+config t
+
+hostname REste
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 7
+password cisco
+login
+
+enable password class 
+
+int S0/0/0
+ip address 170.2.5.250 255.255.255.252
+no shut
+
+int f0/1
+ip address 150.6.9.97 255.255.255.224
+no shut
+
+router ospf 1
+network 150.6.9.96 0.0.0.31 area 0 
+network 170.2.5.248 0.0.0.3 area 0
+passive-interface f0/1
+
+enable
+config t
+-------------------------------------------
+enable
+config t
+
+hostname ISP
+
+service password-enc
+
+no ip domain-lookup
+
+line con 0
+password lalito
+login
+logging sync
+
+line vty 0 4
+password lalito
+login
+logging sync
+
+enable password armando
+
+int S0/0/0
+ip address 221.10.10.161 255.255.255.224
+clock rate 128000
+no shut
+
+int Lo0
+ip address 1.1.1.1 255.255.255.252
+no shut
+
+int Fa0/0
+ip address 148.37.251.254 255.255.252.0
+no shut
+
+int Fa0/1
+ip address 157.166.240.15  255.255.255.192
+no shut
+
+ip route 140.5.8.64 255.255.255.192 s0/0/0
+ip route 170.2.5.240 255.255.255.240 s0/0/0
+ip route 150.6.9.96 255.255.255.224 s0/0/0
+
+-----------------------------------------------
+-------------------------------------------
+ROUTER ALUMNO
+enable
+config t
+
+hostname ISP
+
+service password-enc
+
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+logging sync
+
+enable password class
+
+int S0/0/0
+ip address 221.10.10.161 255.255.255.224
+clock rate 128000
+no shut
+
+int Lo0
+ip address 1.1.1.1 255.255.255.252
+no shut
+
+int Fa0/0
+ip address 148.37.251.254 255.255.252.0
+no shut
+
+int Fa0/1
+ip address 157.166.240.15  255.255.255.192
+no shut
+
+ip route 140.5.8.64 255.255.255.192 s0/0/0
+ip route 170.2.5.240 255.255.255.240 s0/0/0
+ip route 150.6.9.96 255.255.255.224 s0/0/0

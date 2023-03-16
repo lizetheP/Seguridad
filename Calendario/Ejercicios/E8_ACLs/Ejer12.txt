@@ -1,0 +1,84 @@
+Mejores prácticas para el diseño de ACLs EXTENDIDA
+1. Identificar la fuente (tráfico fuente) y el destino
+2. Trazar el trayecto del tráfico no permitido. 
+3. Trazar el trayecto del tráfico permitido. 
+4. Identificar el router donde se instalará la lista de control de acceso.
+5. Identificar la interfaz donde se va a asociar la lista de control de acceso.
+6. Escribir la ACL, instalarla y probarla.
+   NOTA: Realizar pruebas de conectividad antes y después de instalar una ACL
+
+REGLA:
+1. LAS LISTAS DE ACCESO ESTÁNDAR SE DEBEN INSTALAR LO MAS CERCA DEL
+   DESTINO.
+2. LAS LISTAS DE ACCESO EXTENDIDAS SE DEBEN INSTALAR LO MAS CERCA DEL
+   ORIGEN. PARA EVITAR QUE EL TRÁFICO LLEGUE A LUGARES DONDE NO 
+   NECESITE LLEGAR. 
+
+---------------------------------------------------
+a. Diseña una lista de control de acceso estándar para impedir que 
+las computadoras de los Alumnos tengan acceso a la 
+subred de Directivos y a la subred de Profesores.
+
+access-list 
+access-list 
+
+int 
+ip access-group 
+
+---------------------------------------------------
+b. Diseña una lista de control de acceso extendida para impedir que 
+las computadoras de los Alumnos tengan acceso a la 
+subred de Directivos y a la subred de Profesores.
+
+access-list 
+access-list 
+access-list 
+
+int 
+ip access-group
+
+---------------------------------------------------
+c. Diseña una lista de control de acceso extendida para impedir que las computadoras de la 
+subred de Profesores tengan acceso al server de la subred de Directivos.
+
+access-list 
+access-list 
+
+int
+ip access-group
+
+---------------------------------------------------
+d.Diseña una lista de control de acceso extendida para que el visitante 01 no pueda acceder 
+a las servicios externos de Internet
+
+access-list
+access-list
+
+int 
+ip access-group 
+
+---------------------------------------------------
+e.Diseña una lista de control de acceso extendida para que la sección de Estudiantes no pueda 
+acceder al servidor de profesores vía  el protocolo WEB ni por FTP.
+
+!PROTOCOLO FTP
+access-list 
+access-list 
+!PROTOCOLO WEB
+access-list 
+access-list 
+
+int G0/1
+ip access-group 
+
+---------------------------------------------------
+f.Diseña una lista de control de acceso extendida para que ninguna dirección IP interna 
+de nuestra red pueda acceder al servidor de LOL vía el protocolo WEB. 
+¿En qué router instalarás esta lista de control de acceso?
+
+access-list 
+access-list  
+
+int 
+ip access-group
+
