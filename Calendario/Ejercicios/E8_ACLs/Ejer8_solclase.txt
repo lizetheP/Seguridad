@@ -1,0 +1,107 @@
+1. Identificar la fuente/origen (tráfico fuente)
+2. Trazar el trayecto del tráfico NO permitido. 
+3. Trazar el trayecto del tráfico permitido. 
+4. Identificar el router donde se instalará la lista de control de acceso.
+5. Identificar la interfaz donde se va a asociar la lista de control de acceso.
+6. Escribir la ACL, instalarla y probarla.
+
+EJERCICIO 1
+------------------
+1.Diseña una lista de control de acceso estándar 
+para impedir que las computadoras de la subred 
+de Alumnos tengan acceso a la subred de Directivos.
+
+RouterA
+access-list 10 deny 132.254.89.0 0.0.0.127
+access-list 10 permit any 
+!access-list 10 deny any
+
+int g0/0
+ip access-group 10 out
+
+EJERCICIO 2
+-----------------------
+2.Diseña una lista de control de acceso 
+estándar para impedir que las computadoras
+ de la subredes de Profesores y Alumnos 
+tengan acceso a la subred de Directivos.
+
+Router A
+access-list 20 deny 132.254.89.232 0.0.0.7
+access-list 20 deny 132.254.89.0 0.0.0.127
+access-list 20 permit any
+!access-list 20 deny any (IMPLICITO)
+
+int g0/0
+ip access-group 20 out
+
+EJERCICIO 3
+-----------------
+Diseña una lista de control de acceso estándar 
+para que el visitante 01 no pueda acceder 
+a la sección de servidores
+
+Router A
+
+!access-list 30 deny 132.254.89.120 0.0.0.0
+access-list 30 deny host 132.254.89.120
+access-list 30 permit any
+!access-list 30 deny any
+
+int g0/1
+ip access-group 30 out
+
+EJERCICIO 4
+-----------------------------------
+4. Diseña una lista de control de acceso
+estándar para impedir que las computadoras 
+de los Alumnos tengan acceso a la subred 
+de Directivos y a la subred de Profesores.
+
+Router A y B
+
+access-list 40 deny 132.254.89.0 0.0.0.127
+access-list 40 permit any
+
+int g0/0
+ip access-group 40 out
+
+EJERCICIO 5
+-----------------------------------
+4. Diseña una lista de control de acceso
+extendica para impedir que las computadoras 
+de los Alumnos tengan acceso a la subred 
+de Directivos y a la subred de Profesores.
+
+! ip filtra tráfico capa 3 (ping) y capa 4(tcp /ud _
+                   http, ftp, telnet)
+ROUTER B
+
+access-list 140 deny ip 132.254.89.0 0.0.0.127 132.254.89.192 0.0.0.31
+access-list 140 deny ip 132.254.89.0 0.0.0.127 132.254.89.232 0.0.0.7
+access-list 140 permit ip any any
+!access-list 140 deny ip any any
+
+int g0/1
+ip access-group 140 in
+
+
+255.255.255.255
+255.255.255.1110 0000
+           .224
+----------------------
+0.0.0.31
+
+
+255.255.255.255
+255.255.255.1111 1000
+           .248
+------------------
+0.0.0.7
+
+
+255.255.255.255
+255.255.255.1000 0000
+           .128
+---------------------
+0. 0. 0. 127
