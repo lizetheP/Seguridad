@@ -1,0 +1,97 @@
+---------------------------------------------------------------
+Configuración del router A
+---------------------------------------------------------------
+
+router rip
+version 2
+passive-interface g0/1
+El comando no auto-summary evita que RIP haga un resumen 
+automático de la red 10.0.0.0/8, si no lo hacemos así, 
+los routers no van a ser capaces de conocer las subredes 
+de esa red principal. De esta forma los forzamos a que publiquen 
+las subredes tal como son.
+
+---------------------------------------------------------------
+Configuración del router B
+---------------------------------------------------------------
+
+router rip
+version 2
+passive-interface g0/1
+passive-interface s0/1/0
+no auto-summary
+
+DHCP
+----------------
+! DIRECCIONES EXCLUIDAS DE LAS INTERFACES PUERTAS DE ENLACE PREDERTMINADAS
+ip dhcp excluded-address 10.0.7.254
+ip dhcp excluded-address 10.0.1.254
+
+! DHCP para la subred RB_G0/1
+ip dhcp pool RB_G0/1
+network 10.0.4.0 255.255.252.0 
+!1024 direcciones disponibles - 2 y una ya
+! esta ocupada por el gateway.
+default-router 10.0.7.254
+exit
+
+! DHCP para la subred RA_G0/1
+ip dhcp pool RA_G0/1
+network 10.0.0.0 255.255.254.0
+default-router 10.0.1.254
+exit
+
+NAT
+--------------
+
+! A todas las direcciones entregadas de manera dinámica, sacarlas al exterior
+! SERVICIO DE PAT
+ip nat pool MyPool 65.10.8.67 65.10.8.91 netmask 255.255.255.224
+access-list 10 permit any
+! Relación de esa lista quién va a acceder a qué pool
+ip nat inside source list 10 pool MyPool overload
+! ip nat inside source indica dos posibles fuentes:
+! 1. Una lista de control x
+! 2. Un direccionamiento de traducción estática
+
+
+ip nat pool MyPool 65.10.8.67 65.10.8.91 netmask 255.255.255.224
+access-list 10 permit any
+ip nat inside source list 10 pool MyPool overload
+
+int s0/1/0
+ip nat outside 
+!Interfaces de conexión con el exterior
+
+int s0/1/1
+ip nat inside
+
+int g0/1
+ip nat inside
+
+
+
+---------------------------------------------------------------
+Configuración del router RA
+---------------------------------------------------------------
+Para completar el protocolo de instalación del DHCP distribuido
+Configure RA as a DHCP relay agent
+El router RA va a contactar al RB por alguna de sus 3 interfaces (go/1, s0/1/0 o s0/1/1)
+
+interface g0/1
+ip helper-address 10.0.3.129
+! Para resolver la problemática de que el router A no tiene el DHCP, pero 
+! alguién más sí lo tiene y lo voy a poder contactar por alguna de sus tres 
+! interfaces del router B.
+! CON ESTO EL ROUTER A CONTACTA AL ROUTER B PARA QUE LE ENTREGUE DIRECCIONES IP
+! DINÁMICAS A TODOS LOS EQUIPOS DE LA SUBRED 10.0.0.0
+exit
+
+int s0/1/0
+ip nat inside
+
+int g0/1
+ip nat inside
+
+
+
