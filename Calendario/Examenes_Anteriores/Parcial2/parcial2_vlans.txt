@@ -1,0 +1,43 @@
+---------------------------------------------------------------
+Configuración parcial del router 
+---------------------------------------------------------------
+
+int g0/0.40
+description VLAN Directores
+encapsulation dot1q 40
+ip address 172.20.0.193 255.255.255.224
+
+! La última ip de la subred
+! VLAN 10, todo su tráfico va a llegar por la subinterfaz g0/1.10
+! VLAN 20, todo su tráfico va a llegar por la subinterfaz g0/1.20
+
+int g0/0.50
+description VLAN Alumnos
+encapsulation dot1q 50
+ip address 172.20.0.1 255.255.255.128
+
+int g0/0
+no shut
+
+!--------------------------------------------------------------------------------------------------
+Configuración parcial S1
+-----------------------------------------------------
+vlan 40
+name Directores
+
+vlan 50
+name Alumnos
+
+!Asignar los puertos que le corresponden a la vlan 40
+!A través de range f0/1-10 los primeros 10 puertos
+
+interface range f0/1-10
+switchport mode access
+switchport access vlan 40
+
+interface range f0/11-20
+switchport mode access
+switchport access vlan 50
+
+interface  f0/1
+switchport mode trunk
