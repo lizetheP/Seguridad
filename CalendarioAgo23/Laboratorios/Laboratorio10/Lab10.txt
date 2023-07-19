@@ -1,0 +1,10 @@
+1. Allow web traffic originating from the 192.168.10.0/24 network to go
+to any network.
+
+
+
+2. Allow an SSH connection to the R3 serial interface from PC-A.
+3. Allow users on 192.168.10.0/24 network access to 192.168.20.0/24 network.
+4. Allow web traffic originating from the 192.168.30.0/24 network to access R1 via the web interface and the
+209.165.200.224/27 network on ISP. The 192.168.30.0/24 network should NOT be allowed to access any
+other network via the web.

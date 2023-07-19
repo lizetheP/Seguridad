@@ -1,0 +1,111 @@
+
+-------- RAAA -------
+enable
+config t
+
+hostname RouterAAA
+
+int fa0/0
+ip address 221.45.10.65 255.255.255.192
+no shut
+
+int s0/0/0
+ip address 221.45.10.130 255.255.255.252
+no shut
+
+router rip
+ver 2
+network 221.45.10.0
+passive-interface f0/0
+no auto-summary
+redistribute static
+
+! DHCP
+! ---------------------------------------
+! DHCP Exceptions
+ip dhcp excluded-address 221.45.10.65
+
+! DHCP Pool
+ip dhcp pool RAAA_F0
+network 221.45.10.64 255.255.255.192
+default-router 221.45.10.65
+
+-------- RFrontera -------
+enable
+config t
+
+hostname RFrontera
+
+int S0/0/0
+ip address 132.254.89.62 255.255.255.192
+no shut
+
+int S0/1/1
+ip address 221.45.10.133 255.255.255.252
+clock rate 128000
+no shut
+
+int S0/1/0
+ip address 221.45.10.129 255.255.255.252
+clock rate 128000
+no shut
+
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+router rip
+ver 2
+network 221.45.10.0
+passive-interface s0/0/0
+redistribute static
+no auto-summary
+
+
+-------- RBBB ----------
+enable
+config t
+
+hostname RBBB
+
+int S0/0/0
+ip address 221.45.10.134 255.255.255.252
+no shut
+
+int f0/0
+ip address 221.45.10.1 255.255.255.192
+no shut
+
+router rip
+ver 2
+network 221.45.10.0
+passive-interface f0/0
+no auto-summary
+redistribute static
+
+! DHCP
+! ---------------------------------------
+! DHCP Exceptions
+ip dhcp excluded-address 221.45.10.1
+
+! DHCP Pool
+ip dhcp pool RBBB_F0
+network 221.45.10.0 255.255.255.192
+default-router 221.45.10.1
+
+! ACCESS- LISTS
+!----------------------------------------------
+!Lista de acceso estándar (LO MAS CERCANA AL DESTINO) en router BBB
+!Ningún dispositivo de la LAN que depende del router AAA puede acceder a la red del router BBB
+access-list 10 deny 221.45.10.64 0.0.0.63 
+access-list 10 permit any
+int f0/0
+ip access-group 10 out
+
+!Lista de acceso extendida (LO MAS CERCANA AL ORIGEN) en router BBB
+!Ningún dispositivo de la LAN que depende del router BBB puede acceder al server de Youtube vía WEB
+access-list 100 deny tcp 221.45.10.0 0.0.0.63 host 148.37.251.1 eq 80
+access-list 100 permit ip any any
+int f0/0
+ip access-group 100 in
+
+
+

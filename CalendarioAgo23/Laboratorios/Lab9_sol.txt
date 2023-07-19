@@ -1,0 +1,265 @@
+
+---------------------------------------------------------------
+Configuración del router R1
+---------------------------------------------------------------
+enable
+config t
+hostname R1
+service password-encryption
+enable secret class
+no ip domain-lookup
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int Lo0
+ip add 192.168.20.1 255.255.255.0
+no shut
+
+int g0/1
+ip address 192.168.10.1 255.255.255.0
+no shut
+
+int s0/1/0
+ip address 10.1.1.1 255.255.255.252
+clock rate 128000
+no shut
+
+router rip
+version 2
+network 192.168.20.0
+network 192.168.10.0
+network 10.0.0.0
+no auto-summary
+
+---------------------------------------------------------------
+Configuración del router ISP
+---------------------------------------------------------------
+enable
+config t
+hostname ISP
+service password-encryption
+enable secret class
+no ip domain-lookup
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int Lo0
+ip add 209.165.200.225 255.255.255.224
+no shut
+
+int s0/1/0
+ip address 10.1.1.2 255.255.255.252
+no shut
+
+int s0/1/1
+ip address 10.2.2.2 255.255.255.252
+clock rate 128000
+no shut
+
+router rip
+version 2
+network 209.165.200.0
+network 10.0.0.0
+no auto-summary
+
+
+---------------------------------------------------------------
+Configuración del router R3
+---------------------------------------------------------------
+enable
+config t
+hostname R3
+service password-encryption
+enable secret class
+no ip domain-lookup
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/1
+ip address 192.168.30.1 255.255.255.0
+no shut
+
+int Lo0
+ip add 192.168.40.1 255.255.255.0
+no shut
+
+int s0/1/1
+ip address 10.2.2.1 255.255.255.252
+no shut
+
+router rip
+version 2
+network 192.168.30.0
+network 192.168.40.0
+network 10.0.0.0
+no auto-summary
+
+
+-----------------------------------------------------
+Configuración del switch S1
+-----------------------------------------------------
+ena
+config t
+hostname S1 
+enable secret class
+no ip domain-lookup
+service password-encryption
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address 192.168.10.11 255.255.255.0
+no shut
+
+ip default-gateway 192.168.10.1
+
+
+-----------------------------------------------------
+Configuración del switch S2
+-----------------------------------------------------
+ena
+config t
+hostname S2
+ 
+enable secret class
+no ip domain-lookup
+service password-encryption
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address 192.168.30.11 255.255.255.0
+no shut
+
+ip default-gateway 192.168.30.1
+
+
+---------------------------------------------------
+Lista de acceso 1
+
+allows traffic from all hosts on the 192.168.10.0/24 network and 
+all hosts on the 192.168.20.0/24 network to access all hosts 
+on the 192.168.30.0/24 network. 
+
+Router 3
+---------
+access-list 1 permit 192.168.10.0 0.0.0.255
+access-list 1 permit 192.168.20.0 0.0.0.255
+access-list 1 deny any
+
+int g0/1
+ip access-group 1 out
+
+255.255.255.255
+255.255.255.0
+---------------
+0.0.0.255
+
+---------------------------------------------------
+Lista de acceso 2
+
+allow traffic from all hosts on the 192.168.40.0/24 network access 
+to all hosts on the 192.168.10.0/24 network. 
+Also, only allow host PC-C access to the 192.168.10.0/24 network. 
+The name of this access list should be called BRANCH-OFFICE-POLICY.
+
+Router 1
+---------
+access-list 2 permit 192.168.40.0 0.0.0.255
+access-list 2 permit 192.168.30.3 0.0.0.0
+access-list 2 deny any
+
+int g0/1
+ip access-group 2 out
+
+ip access-list standard BRANCH-OFFICE-POLICY
+permit host 192.168.30.3  
+! Es lo mismo que en la anterior permit 192.168.30.3 0.0.0.0
+permit 192.168.40.0 0.0.0.255
+exit
+
+int g0/1
+ip access-group BRANCH-OFFICE-POLICY out
+
+---------------------------------------------------
+Modificación de lista de acceso
+
+Users from the 209.165.200.224/27 (Lo0 ISP) network should be allowed 
+full access to the 192.168.10.0/24 network. 
+Management also wants ACLs on all of their routers to follow consistent 
+rules. A deny any ACE should be placed at the end of all ACLs. 
+You must modify the BRANCH-OFFICE-POLICY ACL. 
+You will add two additional lines to this ACL. 
+
+ip access-list standard BRANCH-OFFICE-POLICY
+permit host 192.168.30.3  
+permit 192.168.40.0 0.0.0.255
+permit 209.165.200.224 0.0.0.31 
+!255.255.255.224 (255-224)
+deny any
+exit
+
+int g0/1
+ip access-group BRANCH-OFFICE-POLICY out
+
+--------
+
+R1#sh access-lists
+Standard IP access list BRANCH-OFFICE-POLICY
+    10 permit 192.168.40.0 0.0.0.255 (5 match(es))
+    20 permit host 192.168.30.3 (4 match(es))
+
+R1(config)#ip access-list standard BRANCH-OFFICE-POLICY
+R1(config-std-nacl)#30 permit 209.165.200.224 0.0.0.31
+R1(config-std-nacl)#40 deny any
+R1(config-std-nacl)#end
+
+R1#sh access-lists
+Standard IP access list BRANCH-OFFICE-POLICY
+    10 permit 192.168.40.0 0.0.0.255 (5 match(es))
+    20 permit host 192.168.30.3 (4 match(es))
+    30 permit 209.165.200.224 0.0.0.31
+    40 deny any

@@ -1,0 +1,127 @@
+--------- MyISP --------
+Ya configurado
+
+-------- RFrontera -------
+enabled
+confg t
+
+host name RFrontera
+
+service password-description
+no ip domain-lookat
+
+line con 0
+password cisco
+login
+logingg sync
+
+line vtty 0 4
+password cisco
+loggin
+
+enable passvvord class
+
+
+int S0/0/0
+descripcion La conexion con el ISP 
+ip address 134.89.254.245 255.255.255.252
+no shut
+
+
+int S0/0/1
+description La conexion con el RA
+ip address 198.68.1.245 255.255.255.252
+clock rate 1280
+no shut
+
+
+int g0/0
+ip add 210.100.155.126 255.255.255.27
+no shut
+
+int g0/1
+descrip Zona de servidores
+ip address 210.10.10.94 255.255.255.224
+no shut
+
+
+ip route 0.0.0.0  0.0.0.0  134.89.254.246
+
+
+router eigrp 2000
+network 210.10.10.0
+network 210.100.155.0
+network 198.68.1.0
+default-information originate
+passive-int s0/0/0
+passive-int s0/0/1
+passive-int g0/0
+passive-int g0/1
+
+
+-------- RA ----------
+enabled
+confg t
+
+hostsname RA
+
+service password-enc
+no ip domain lookat
+
+line con 0
+password cisco
+loggin
+loging sync
+
+line vty 0 4
+password cisco
+login
+
+enable passuord class
+
+int S0/0/0
+description La conexion con el RFrontera 
+ip address 198.68.1.250 255.255.255.252
+no shut
+
+int g0/0
+description Conexion con s0
+ip add 210.100.130.190 255.255.255.192
+shut
+
+int g0/1
+description Conexion con s1
+ip add 210.100.130.126 255.255.255.128
+shut
+
+
+router eigrp 200
+network 210.100.130.0
+network 198.68.1.0
+passive-int g0/0
+passive-int g0/1
+
+---- switch3 : Zona de servers -----
+ena
+config t
+hostname S3
+
+line consola 0
+passsword cisco
+loggin
+login sync
+
+line vwty 0 15
+password cisco
+login
+
+int vlan 100
+ip addess 210.10.10.93   255.255.255.254
+no shut
+
+ip defaul gateway  210.10.10.96
+
+
+
+
+

@@ -1,0 +1,42 @@
+CONFIGURACIONES ORIGINALES
+----RA-----
+
+router rip
+ version 2
+ passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/1
+ network 196.128.11.0
+ network 198.68.1.0
+
+----Rf-----
+
+router rip
+ version 2
+ redistribute static 
+ passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/1
+ passive-interface Serial0/0/0
+ network 198.68.1.0
+ network 210.10.10.0
+ network 221.57.1.0
+
+CONFIGURACIONES EIGRP
+----RA-----
+
+router eigrp 2020
+ passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/1
+ network 196.128.11.0
+ network 198.68.1.0
+
+----Rf-----
+
+router eigrp 2020
+ redistribute static 
+ passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/1
+ passive-interface Serial0/0/0
+ network 198.68.1.0
+ network 210.10.10.0
+ network 221.57.1.0
+

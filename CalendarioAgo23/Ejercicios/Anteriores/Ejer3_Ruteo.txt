@@ -1,0 +1,83 @@
+--------- MyISP --------
+Ya configurado
+
+-------- RFrontera -------
+enable
+config t
+
+hostname RFrontera
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int S0/0/0
+description La conexion con el ISP 
+ip address 134.89.254.242 255.255.255.252
+no shut
+
+int S0/0/1
+description La conexion con el RA 
+ip address 198.68.1.249 255.255.255.252
+clock rate 128000
+no shut
+
+int g0/0
+description SubredAmarilla
+ip add 221.57.1.254 255.255.255.0
+no shut
+
+
+ip route 196.128.11.0  255.255.255.0  s0/0/1
+ip route 151.101.1.67  255.255.255.255  s0/0/0
+
+
+-------- RA ----------
+enable
+config t
+
+hostname RA
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int S0/0/0
+description La conexion con el RFrontera 
+ip address 198.68.1.250 255.255.255.252
+no shut
+
+int g0/0
+description Subred VerdeDer
+ip add 196.128.11.62 255.255.255.192
+no shut
+
+int g0/1
+description Subred VerdeIzq
+ip add 196.128.11.190 255.255.255.192
+no shut
+
+ip route 221.57.1.0 255.255.255.0 s0/0/0
+ip route 151.101.1.64  255.255.255.192   198.68.1.249
+
+

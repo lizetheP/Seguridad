@@ -1,0 +1,109 @@
+1. Pedir passwords
+2. Obtener la configuración actual RF y RA
+3. Nueva configuración con OSPF
+4. Apagar o deshabilitar el protolo EIGRP
+4. Copiar configuración en routers
+5. Pruebas de conectividad
+
+
+EIGRP
+!ROUTER A
+router eigrp 2020
+ passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/1
+ network 196.128.11.0
+ network 198.68.1.0
+
+!OSPF
+!ROUTER A
+! router ospf identificador del proceso (1.. 65535)
+
+no router eigrp 2020
+
+router ospf 2021 
+network 196.128.11.0 0.0.0.63 area 0
+network 196.128.11.128 0.0.0.63 area 0
+network 198.68.1.248 0.0.0.3 area 0 
+passive-interface GigabitEthernet0/0
+passive-interface GigabitEthernet0/1
+
+
+198.68.1.248 / 30
+255.255.255.11111100
+
+255.255.255.255
+255.255.255.252
+----------------
+0.0.0.3
+
+196.128.11.0 / 26
+255.255.255.1100 0000
+
+255.255.255.255
+255.255.255.192
+----------------
+0.0.0.63
+
+passive-interface GigabitEthernet0/0
+passive-interface GigabitEthernet0/1
+
+ network 196.128.11.0
+ network 198.68.1.0
+
+ROUTER FRONTERA EIGRP
+
+router eigrp 2020
+ redistribute static 
+ passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/1
+ passive-interface Serial0/0/0
+ network 198.68.1.0
+ network 210.10.10.0
+ network 221.57.1.0
+ 
+ROUTER FRONTERA OSPF
+
+no router eigrp 2020
+
+router ospf 2022
+network 198.68.1.248 0.0.0.3 area 0
+network 210.10.10.64 0.0.0.31 area 0
+network 221.57.1.0 0.0.0.255 area 0
+passive-interface GigabitEthernet0/0
+passive-interface GigabitEthernet0/1
+passive-interface Serial0/0/0
+default-information originate
+
+rip
+default-information originate
+redistribute static
+
+eigrp
+redistribute static
+
+ospf
+default-information originate
+
+
+255.255.255.255
+255.255.255.0
+---------------
+0.0.0.255
+
+255.255.255.255
+255.255.255.224
+-----------------
+
+
+255.255.255.255
+255.255.255.252
+----------------
+0.0.0.3
+ network 210.10.10.0
+ network 221.57.1.0
+
+
+ redistribute static 
+ passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/1
+ passive-interface Serial0/0/0

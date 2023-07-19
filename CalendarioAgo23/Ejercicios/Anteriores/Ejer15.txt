@@ -1,0 +1,157 @@
+Comandos que agregaremos a la configuración ya existente en el ROUTER:
+
+Agregar los DHCPs
+----------------------
+!VLAN 10
+!------------ 
+! HomeOffice 192.168.0.0/27
+
+! DIRECCIONES EXCLUIDAS
+ip dhcp excluded-address 192.168.0.30
+ip dhcp excluded-address 192.168.0.1 192.168.0.2
+! Excluimos servidor e impresora
+
+! DHCP para HomeOffice g0/1.10
+ip dhcp pool HomeOffice
+network 192.168.0.0 255.255.255.224
+default-router 192.168.0.30
+exit
+
+!VLAN 20
+!------------ 
+! Profesional 192.168.0.32/27
+
+! DIRECCIONES EXCLUIDAS
+ip dhcp excluded-address 192.168.0.62
+
+! DHCP para Profesional g0/1.20
+ip dhcp pool Profesional
+network 192.168.0.32 255.255.255.224
+default-router 192.168.0.62
+exit
+
+!VLAN 30
+!------------ 
+! EduBasica 192.168.0.64/27
+
+! DIRECCIONES EXCLUIDAS
+ip dhcp excluded-address 192.168.0.94
+
+! DHCP para EduBasica g0/1.30
+ip dhcp pool EduBasica
+network 192.168.0.64 255.255.255.224
+default-router 192.168.0.94
+exit
+
+!VLAN 40
+!------------ 
+! Redes sociales 192.168.0.96/28
+! 96 + 16 = 112 -2 = 110
+
+! DIRECCIONES EXCLUIDAS
+ip dhcp excluded-address 192.168.0.110
+
+! DHCP para RedesSociales g0/1.40
+ip dhcp pool RedesSociales
+network 192.168.0.96 255.255.255.240
+default-router 192.168.0.110
+exit
+
+!VLAN 50
+!------------ 
+! Entretenimiento 192.168.0.112/28
+! 112 + 16 = 128 -2 = 126
+
+! DIRECCIONES EXCLUIDAS
+ip dhcp excluded-address 192.168.0.94
+
+! DHCP para Entretenimiento g0/1.50
+ip dhcp pool Entretenimiento
+network 192.168.0.112 255.255.255.240
+default-router 192.168.0.126
+exit
+
+----------------------------------------------
+! INSTALACIÓN DE NAT. HAY UNA SOLA DIRECCIÓN IP PÚBLICA 189.172.74.90
+
+access-list 1 permit 192.168.0.0 0.0.0.255
+! ip nat pool MyPool 189.172.74.90 255.255.255.252
+! ip nat inside source list 1 pool MyPool overload
+! esto si usaramos un pool
+! pero como queremos utilizar la ip de la interface que me une con el ISP.
+! y de la cual quiero recuperar la información
+! INSTALACIÓN DEL PAT CON UNA SOLA DIRECCIÓN
+!--------------------------------------------
+ip nat inside source list 1 interface g0/0 overload
+! overload para que muchas direcciones internas puedan usar
+! una sola dirección pública.
+
+! CONFIGURAR INTERFASES Y SUBINTERFASES INSIDE Y OUTSIDE.
+! ------------------------------------------
+
+int G0/0
+ip nat outside
+! INTERFASE DE SALIDA 
+
+! INTERFASES DE ENTRADA
+int G0/1.1
+ip nat inside 
+
+int G0/1.10
+ip nat inside 
+
+int G0/1.20
+ip nat inside 
+
+int G0/1.30
+ip nat inside
+
+int G0/1.40
+ip nat inside
+
+int G0/1.50
+ip nat inside
+
+int G0/1
+no shut 
+
+! PORT FORWARDING REQUISITO REALIZAR NAT ESTÁTICO
+! --------------------------------------------------
+!ip nat inside source static 192.168.0.1 189.172.74.90
+! ESTO CONSUME TODOS LOS SERVICIOS DEL NATEO ESTÁTICO
+
+! TRADUCCIÓN PARA EL SERVIDOR
+ip nat inside source static tcp 192.168.0.1 80 189.172.74.90 50000
+! A partir de este momento si ya el servidor podía acceder a los servicios del exterior,
+! a partir de este momento nuestro servidor es contactable desde el exterior a través
+! de la dirección ip pública 189.172.74.90 y el puerto con el que queremos que nos
+! contacten (50000)
+
+! TRADUCCIÓN PARA EL SWITCH
+ip nat inside source static tcp 192.168.0.129 23 189.172.74.90 23
+! A partir de este momento nuestro switch es contactable desde el exterior a través
+! de la dirección ip pública 189.172.74.90 y el puerto con el que queremos que nos
+! contacten (23)
+
+! tengo hasta 65536 para el puerto. Elevar 2 a la 16 = 65536 desde 0 - 65536
+! tengo que poner el tipo de protocolo que se va a traducir, la dirección
+! interna privada, el puerto WEB y la dirección ip pública y el puerto
+! por el cual nos van a contactar desde el exterior.
+! Debo definir el puerto por el que voy a estar escuchando todas la peticiones
+! El puerto es el 80
+! Se llama port forwarding porque yo puedo definir desde el exterior
+! que puerto quiero que me contacten a mi servidor del 80
+! Y en el router al momento de hacer el nateo se va a identificar
+! el puerto por el que llegué y el puerto por el que debo entrar al servidor
+! Como hacemos para acceder al switch desde el exterior
+
+! NAT CON PORT FORWARDING
+! 1. Dirección IP interna PORT Dirección IP pública PORT
+!    Se llama port forwarding porque lo que lo que llega por un puerto de petición
+!    lo podemos enviar a otro puerto diferente o al mismo puerto
+! 2. Traducción estática (dirección privada - dirección pública)
+!     Con eso conseguimos el port-forwarding
+
+ 
+ 
+ 

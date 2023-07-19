@@ -1,0 +1,50 @@
+
+---------------------------------------------------------------
+Configuración parcial del router MyNewRouter
+---------------------------------------------------------------
+ena
+config t
+hostname 
+enable secret class
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/0
+ip add 
+no shut
+
+--- En esta sección debes incluir la configuración de las Subinterfaces ---
+--------------------------------------------------------------------------------------------------
+
+ip route 0.0.0.0 0.0.0.0 g0/0
+
+
+-----------------------------------------------------
+Configuración parcial del switch S-NewVLANs
+-----------------------------------------------------
+ena
+config t
+hostname 
+enable secret class
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+-- En esta sección agregar los comandos de configuración de VLANs --
+-----------------------------------------------------------------------------------------------
+

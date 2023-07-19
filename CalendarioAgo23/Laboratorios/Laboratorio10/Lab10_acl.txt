@@ -1,0 +1,23 @@
+Permitir tráfico de 192.168.10.0 hacia any
+Permitir conexión ssh de PC-A a s0/1/1 R3
+Permitir tráfico de 192.168.10.0 hacia 192.168.20.0
+Permitir tráfico WEB de 192.168.30.0 hacia R1 y 209.165.200.224,
+ no permite conexión WEB hacia otras redes
+
+R1
+
+ip access-list 100 permit tcp host 192.168.10.3 host 10.2.2.1 eq 22
+ip access-list 100 permit tcp 192.168.10.0 0.0.0.255 any eq 80
+ip access-list 100 permit ip 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255
+ip access-list 100 deny ip any any
+
+R3
+ip access-list 110 permit tcp 192.168.30.0 0.0.0.255 209.165.200.224 0.0.0.31 eq 80
+ip access-list 110 permit tcp 192.168.30.0 0.0.0.255 host 10.1.1.1 eq 80
+ip access-list 110 deny ip any any
+
+
+
+
+
+

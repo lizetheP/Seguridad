@@ -1,0 +1,132 @@
+! ==========================
+! ======= RQueretaro =======
+! ==========================
+
+ena
+config t
+hostname RQueretaro
+
+no ip domain-lookup
+
+! Interface to Telmex ISP
+int s0/0/0
+ip address 177.232.86.2 255.255.255.248
+ip nat outside
+no shut
+
+! Interface to ROficinas
+int s0/1/0
+ip address 192.168.200.249 255.255.255.252
+clock rate 128000
+ip nat inside
+no shut
+
+! Interface to Switch
+int g0/0
+ip address 192.168.200.97 255.255.255.248
+ip nat inside
+no shut
+
+! Interface al router Guadalajara
+int g0/1
+ip address 172.30.0.254 255.255.255.252
+ip nat inside
+no shut
+
+! DHCP Exceptions
+! ip dhcp excluded-address 192.168.200.1 192.168.200.1
+! ip dhcp excluded-address 192.168.200.65 192.168.200.65
+! ip dhcp excluded-address 192.168.200.97 192.168.200.100
+
+! **** DHCP Pools ****
+
+! DHCP Zona de servidores
+! ----------------------------------------------------
+ip dhcp excluded-address 192.168.200.97 192.168.200.100
+
+ip dhcp pool PoolDHCP-Servidores-G00
+network 192.168.200.96 255.255.255.248
+default-router 192.168.200.97
+
+! DHCP Punto de Venta
+!----------------------------------------
+! ip dhcp excluded-address 192.168.200.65
+
+ip dhcp pool PoolDHCP-PuntoVenta-G00
+network 192.168.200.64 255.255.255.224
+default-router 192.168.200.65
+
+! DHCP Oficinas
+!---------------------------------------------------
+ip dhcp excluded-address 192.168.200.1
+
+ip dhcp pool PoolDHCP-ROficinas-G01
+network 192.168.200.0 255.255.255.192
+default-router 192.168.200.1
+
+! **** Nat Static ****
+! Server y Camara Web en zona de servidores
+ip nat inside source static 192.168.200.98 177.232.86.3
+ip nat inside source static 192.168.200.99 177.232.86.4
+
+
+! **** Nat Pool ****
+ip nat pool QroPool 177.232.86.3 177.232.86.7 netmask 255.255.255.248
+access-list 10 permit 192.168.200.0 0.0.0.255
+access-list 10 permit 172.30.0.0 0.0.0.255
+! No se requieren todas las direcciones de la clase B
+ip nat inside source list 10 pool QroPool overload
+! ESTO PERMITE LA TRADUCCIÓN TANTO DEL ROUTER QUERÉTARO,
+! COMO DE LAS RESIDENCIAS Y LA ALBERCA EN GUADALAJARA.
+
+! **** EIGRP ****
+router eigrp 200
+redist static
+network 192.168.200.96 0.0.0.7
+network 192.168.200.248 0.0.0.3
+passive-int g0/0
+passive-int g0/1
+passive-int s0/0/0
+redistribute ospf 400
+
+! **** OSPF ****
+router ospf 400
+default-information originate
+network 172.30.0.252 0.0.0.3 area 0
+redistribute eigrp 200
+passive-int g0/0
+passive-int s0/0/0
+passive-int s0/1/0
+
+! Redirect unknown address to Telmex
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+
+! **** EIGRP ****
+! SOLO DA SERVICIO A LA ZONA DE QUERÉTARO
+router eigrp 200
+redist static
+! NETWORK VLSM NO PUBLICO TODA LA CLASE
+! EIGRP SOLO PUBLICA LOS BLOQUES O SUBREDES QUE NECESITA
+network 192.168.200.96 0.0.0.7
+network 192.168.200.248 0.0.0.3
+passive-int g0/0
+passive-int g0/1
+passive-int s0/0/0
+! S0/0/0 PASIVA PARA NO INUNDAR TRÁFICO AL ISP
+redistribute ospf 400
+
+! **** OSPF ****
+router ospf 400
+! El número 400 debe ser congruente con OSPF de Guadalajara
+default-information originate
+! REDISTRIBUIR RUTA ESTÁTICA
+network 172.30.0.252 0.0.0.3 area 0
+redistribute eigrp 200
+!SOLO INTERFACES QUE PARTICIPAN EN OSPF
+passive-int g0/0
+passive-int s0/0/0
+passive-int s0/1/0
+
+! Redirect unknown address to Telmex
+ip route 0.0.0.0 0.0.0.0 s0/0/0

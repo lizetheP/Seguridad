@@ -1,0 +1,304 @@
+
+---------------------------------------------------------------
+Configuración del router R1
+---------------------------------------------------------------
+enable
+config t
+hostname R1
+service password-encryption
+enable secret class
+no ip domain-lookup
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int Lo0
+ip add 192.168.20.1 255.255.255.0
+no shut
+
+int g0/1
+ip address 192.168.10.1 255.255.255.0
+no shut
+
+int s0/1/0
+ip address 10.1.1.1 255.255.255.252
+clock rate 128000
+no shut
+
+router ospf 1
+network 192.168.10.0 0.0.0.255 area 0
+network 192.168.20.0 0.0.0.255 area 0
+network 10.1.1.0 0.0.0.3 area 0
+
+
+---------------------------------------------------------------
+Configuración del router ISP
+---------------------------------------------------------------
+enable
+config t
+hostname ISP
+service password-encryption
+enable secret class
+no ip domain-lookup
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int Lo0
+ip add 209.165.200.225 255.255.255.224
+no shut
+
+int Lo1
+ip add 209.165.201.1 255.255.255.224
+no shut
+
+int s0/1/0
+ip address 10.1.1.2 255.255.255.252
+no shut
+
+int s0/1/1
+ip address 10.2.2.2 255.255.255.252
+clock rate 128000
+no shut
+
+router ospf 2
+network 209.165.200.224 0.0.0.31 area 0
+network 209.165.201.0 0.0.0.31 area 0
+network 10.1.1.0 0.0.0.3 area 0
+network 10.2.2.0 0.0.0.3 area 0
+
+! Access List 1, 2, 3
+
+access-list 100 remark Allow Web & SSH Access
+access-list 100 permit tcp host 192.168.10.3 host 10.2.2.1 eq 22
+access-list 100 permit tcp any any eq 80
+
+int s0/1/0
+ip access-group 100 out 
+
+---------------------------------------------------------------
+Configuración del router R3
+---------------------------------------------------------------
+enable
+config t
+hostname R3
+service password-encryption
+enable secret class
+no ip domain-lookup
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/1
+ip address 192.168.30.1 255.255.255.0
+no shut
+
+int Lo0
+ip add 192.168.40.1 255.255.255.0
+no shut
+
+int s0/1/1
+ip address 10.2.2.1 255.255.255.252
+no shut
+
+router ospf 3
+network 192.168.30.0 0.0.0.255 area 0
+network 192.168.40.0 0.0.0.255 area 0
+network 10.2.2.0 0.0.0.3 area 0
+
+! Access list 4
+ip access-list extended WEB-POLICY
+permit tcp 192.168.30.0 0.0.0.255 host 10.1.1.1 eq 80
+permit tcp 192.168.30.0 0.0.0.255 209.165.200.224 0.0.0.31 eq 80
+
+interface S0/1/1
+ip access-group WEB-POLICY out
+
+
+-----------------------------------------------------
+Configuración del switch S1
+-----------------------------------------------------
+ena
+config t
+hostname S1 
+enable secret class
+no ip domain-lookup
+service password-encryption
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address 192.168.10.11 255.255.255.0
+no shut
+
+ip default-gateway 192.168.10.1
+
+
+-----------------------------------------------------
+Configuración del switch S3
+-----------------------------------------------------
+ena
+config t
+hostname S3
+ 
+enable secret class
+no ip domain-lookup
+service password-encryption
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address 192.168.30.11 255.255.255.0
+no shut
+
+ip default-gateway 192.168.30.1
+
+
+---------------------------------------------------
+Lista de acceso extendidas (lo más cerca del origen)
+
+1. Allow web traffic originating from the 192.168.10.0/24 network 
+   to go to any network.
+
+   Router 1
+   access-list 110 permit tcp 192.168.10.0 0.0.0.255 any eq 80
+   access-list 110 deny ip any any
+
+   int g0/1
+   ip access-group 110 in 
+
+2. Allow an SSH connection to the R3 serial interface from PC-A.
+
+   Router 1
+   access-list 120 permit tcp host 192.168.10.3 host 10.2.2.1 eq 22
+   access-list 120 deny ip any any
+
+   int g0/1
+   ip access-group 110 in 
+
+
+Lista extendida 1 y 2 
+
+   Router 1
+   access-list 100 remark Allow Web & SSH Access
+   access-list 100 permit tcp host 192.168.10.3 host 10.2.2.1 eq 22
+   access-list 100 permit tcp any any eq 80
+    !mia   access-list 100 permit tcp 192.168.10.0 0.0.0.255 any eq 80
+
+   int s0/1/0
+   ip access-group 100 out 
+
+
+3. Allow users on 192.168.10.0/24 network access to 192.168.20.0/24 network.
+
+   Router 1
+   access-list 130 permit ip 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255
+   
+   int g0/1
+   ip access-group 130 in 
+
+   int Lo0
+   ip access-group 130 out 
+
+
+4. Allow web traffic originating from the 192.168.30.0/24 network to access 
+   R1 via the web interface and the 209.165.200.224/27 network on ISP. 
+   The 192.168.30.0/24 network should NOT be allowed to access any other 
+   network via the web.
+
+   Router 3
+   access-list 140 permit tcp 192.168.30.0 0.0.0.255 host 10.1.1.1 eq 80
+   access-list 140 permit tcp 192.168.30.0 0.0.0.255 209.165.200.224 0.0.0.31 eq 80 
+   
+   int s0/1/1
+   ip access-group 140 out 
+
+   int g0/1
+   ip access-group 140 in 
+
+   NAMED EXTENDED ACL ON R3
+
+   ip access-list extended WEB-POLICY
+   permit tcp 192.168.30.0 0.0.0.255 host 10.1.1.1 eq 80
+   permit tcp 192.168.30.0 0.0.0.255 209.165.200.224 0.0.0.31 eq 80 
+
+   int s0/1/1
+   ip access-group WEB-POLICY out
+
+
+-----------------------------------------------------------------------
+MODIFICACIÓN ACLS
+
+all traffic between the 192.168.10.0/24 and 192.168.30.0/24 
+networks should be allowed.
+
+ACLs originales
+
+   Router 1 (numbered)
+   access-list 100 remark Allow Web & SSH Access
+   access-list 100 permit tcp host 192.168.10.3 host 10.2.2.1 eq 22
+   access-list 100 permit tcp any any eq 80
+
+   access-list 100 permit ip 192.168.10.0 0.0.0.255 192.168.30.0 0.0.0.255
+ 
+   int s0/1/0
+   ip access-group 100 out
+
+
+ip access-list extended 100 
+30 permit ip 192.168.10.0 0.0.0.255 192.168.30.0 0.0.0.255 
+
+----------------------------------- 
+
+   Router 3 (named)
+   ip access-list extended WEB-POLICY
+   permit tcp 192.168.30.0 0.0.0.255 host 10.1.1.1 eq 80
+   permit tcp 192.168.30.0 0.0.0.255 209.165.200.224 0.0.0.31 eq 80 
+
+   permit ip 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255
+ 
+   int s0/1/1
+   ip access-group WEB-POLICY out
+
+ip access-list extended WEB-POLICY
+30 permit ip 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255

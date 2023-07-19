@@ -1,0 +1,112 @@
+------------- ISP ----------------
+........ Ya configurado ........
+
+
+---------- Router Frontera ---------
+enable
+config t
+hostname RFrontera
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco 
+login
+
+int s0/0/0
+ip address 209.89.100.242  255.255.255.252
+no shut
+
+int s0/0/1
+ip address 
+clock rate 
+no shut
+
+int f0/0
+ip address 
+no shut
+
+
+-------- Router A ---------
+enable
+config t
+hostname RA
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int s0/0/0
+ip address 192.168.255.249  255.255.255.252
+no shut
+
+int s0/0/1
+ip address 192.168.255.246  255.255.255.252
+clock rate 128000
+no shut
+
+int f0/0
+ip address 
+no shut
+
+-------- Router B ---------
+enable
+config t
+hostname RB
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int s0/0/0
+ip address 192.168.255.250 255.255.255.252
+no shut
+
+int f0/0
+ip address  
+no shut
+
+int f0/1
+ip address 
+no shut
+
+-------- Switch 1 ---------
+enable
+config t
+hostname S1
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address  192.168.2.189   255.255.255.192
+no shut
+
+ip  default-gateway  192.168.2.190

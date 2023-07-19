@@ -1,0 +1,118 @@
+
+---------------------------------------------------------------
+Configuración del router Gateway
+---------------------------------------------------------------
+
+enable
+config t
+hostname Gateway
+service password-encryption
+enable secret class
+no ip domain-lookup
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/1
+ip address 192.168.1.1 255.255.255.0
+no shut
+
+int s0/1/1
+ip address 209.165.201.18 255.255.255.252
+no shut
+
+! DEFAULT ROUTE
+! ---------------------------------------------------------------
+!Create a default route from the Gateway router to the ISP router
+ip route 0.0.0.0 0.0.0.0 209.165.201.17
+
+! STATIC NAT
+! ---------------------------------------------------------------
+! Configure a static mapping. 
+! -----------------------------
+! A static map is configured to tell the router to translate between the private inside server address 192.168.1.20 and 
+! the public address 209.165.200.225. This allows a user from the Internet to access PC-A. 
+! PC-A is simulating a server or device with a constant address that can be accessed from the Internet.
+
+! ip nat inside source static IP-local IP-Global
+ip nat inside source static 192.168.1.20 209.165.200.225
+
+int g0/1
+ip nat inside
+exit
+
+int s0/1/1
+ip nat outside
+!Interfaces de conexión con el exterior
+
+! DYNAMIC NAT
+! ---------------------------------------------------------------
+! Define an access control list (ACL) 
+! -----------------------------
+! Define an access control list (ACL) that matches the 
+! LAN private IP address range. 
+! ACL 1 is used to allow 192.168.1.0/24 network to be translated. 
+access-list 1 permit 192.168.1.0 0.0.0.255
+! ---------------------------------------------------------------
+! Define the pool of usable public IP addresses 
+! -----------------------------
+ip nat pool MyPublicAccess 209.165.200.242 209.165.200.254 netmask 255.255.255.224
+! ---------------------------------------------------------------
+! Define the NAT from the inside source list to the outside pool. 
+! -----------------------------
+ip nat inside source list 1 pool MyPublicAccess
+! Relación de esa lista quién va a acceder a qué pool
+
+int g0/1
+ip nat inside
+exit
+
+int s0/1/1
+ip nat outside
+!Interfaces de conexión con el exterior
+
+---------------------------------------------------------------
+Configuración del router ISP
+---------------------------------------------------------------
+
+enable
+config t
+hostname ISP
+service password-encryption
+enable secret class
+no ip domain-lookup
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int Lo0
+ip address 192.31.7.1 255.255.255.255
+no shut
+
+int s0/1/0
+ip address 209.165.201.17 255.255.255.252
+clock rate 128000
+no shut
+
+! RUTA ESTÁTICA FROM ISP ROUTER TO THE GATEWAY ROUTER
+! Create a static route from the ISP router to the Gateway router 
+! using the assigned public network address range 209.165.200.224/27.
+
+ip route 209.165.200.224 255.255.255.224 209.165.201.18
+

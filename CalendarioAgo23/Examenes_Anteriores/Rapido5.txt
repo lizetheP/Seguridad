@@ -1,0 +1,65 @@
+
+---------------------------------------------------
+Lista de acceso 1 estandar (lo más cercanos al destino)
+
+acceso estándar que impida que las computadoras de la subred de Teams 
+e Invitados tengan acceso a la sección de Jueces. 
+
+Router Concurso
+
+access-list 10 deny 132.254.89.0 0.0.0.127
+access-list 10 deny 132.254.89.192 0.0.0.31
+access-list 10 permit any
+
+int g0/0
+ip access-group 10 out
+
+---------------------------------------------------
+---------------------------------------------------
+Lista de acceso 2 extendida (lo más cercano a la fuente)
+
+impida todo tipo de tráfico que se dirige al servidor OMI.com.mx 
+y que sale desde cualquier IP asociada con la subred de los Teams. 
+El resto del tráfico debe pasar libremente.
+
+Router Concurso
+access-list 110 deny ip 132.254.89.0 0.0.0.127 host 111.65.32.1
+access-list 110 permit ip any any 
+
+int s0/0/0
+ip access-group 110 out
+---------------------------------------------------
+
+Lista de acceso 3 extendida
+
+Acceso extendida para impedir que las computadoras de la subred de Teams 
+tengan acceso al servidor de ACM vía el protocolo WEB, pero que el resto del 
+tráfico pase libremente (FTP, Telnet, ping, etc.). 
+En esta lista de control de acceso todas las direcciones IP del resto 
+de las subredes internas e IPs del exterior, pueden acceder sin 
+restricción a todos los servicios instalados en la subred de servidores. 
+El protocolo WEB utiliza el puerto 80 del protocolo TCP.
+
+Router Concurso
+access-list 120 deny tcp 132.254.89.0 0.0.0.127 host 132.254.89.130 eq 80
+access-list 120 permit ip any any
+
+int s0/0/0
+ip access-group 120 out
+
+---------------------------------------------------
+Lista de acceso 4 extendida
+
+Diseña una lista de control de acceso extendida que sólo vía el protocolo WEB
+permita acceder desde las IP’s del exterior al servidor del Score Board. 
+El resto del tráfico al igual que el acceso a los otros servidores no está 
+permitido. 
+El servidor del Score Board utiliza el puerto 80 del protocolo TCP y 
+está ubicado en la dirección IP 132.254.89.129.
+
+Router Concurso
+access-list 130 permit tcp any host 132.254.89.129 eq 80
+
+int g0/1
+ip access-group 130 out
+

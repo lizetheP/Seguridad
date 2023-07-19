@@ -1,0 +1,30 @@
+
+access-list 170 permit tcp 132.254.89.0 0.0.0.127 132.254.89.192 0.0.0.31 eq 20
+access-list 170 permit tcp 132.254.89.0 0.0.0.127 132.254.89.192 0.0.0.31 eq 21
+access-list 170 deny tcp 132.254.89.0 0.0.0.127 132.254.89.192 0.0.0.31
+access-list 170 permit ip any any
+
+access-list 170 permit tcp 132.254.89.0 0.0.0.127 132.254.89.192 0.0.0.31 eq 20
+access-list 170 permit tcp 132.254.89.0 0.0.0.127 132.254.89.192 0.0.0.31 eq 21
+access-list 170 deny tcp 132.254.89.0 0.0.0.127 132.254.89.192 0.0.0.31 
+access-list 170 permit ip any any
+
+access-list 160 permit tcp 172.20.0.0 0.0.0.127 172.20.0.128 0.0.0.63 eq 20
+access-list 160 permit tcp 172.20.0.0 0.0.0.127 172.20.0.128 0.0.0.63 eq 21
+access-list 160 deny tcp 172.20.0.0 0.0.0.127 172.20.0.128 0.0.0.63 
+access-list 160 permit ip any any
+
+¿En qué router asignarás esta lista de control de acceso (RA o RB) ?  [D] RB (1 punto)
+router(config)# interface [E] g0/1  (1 punto)
+router(config-if)# ip access-group 170 [F] in (1 punto)
+
+
+
+access-list 160 
+access-list 160  
+access-list 160  
+
+
+interface [E] (1 punto)
+
+router(config-if)# ip access-group 160 [F] (1 punto)

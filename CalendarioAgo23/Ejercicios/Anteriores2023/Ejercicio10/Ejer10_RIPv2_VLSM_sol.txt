@@ -1,0 +1,244 @@
+------------- ISP ----------------
+........ Ya configurado ........
+
+
+---------- Router Frontera ---------
+enable
+config t
+no ip domain-lookup
+service password-enc
+
+hostname RFrontera
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync 
+! CUANDO ESTOY EDITANDO SI SE MUESTRA UN MENSAJE DE CONSOLA, 
+! ME PERMITA CONTINUAR CON MI CONFIGURACIÓN.
+
+! CONEXION REMOTA VIA TELNET
+line vty 0 4
+password cisco 
+login
+
+int s0/0/0
+desc INTERFAZ QUE CONECTA CON EL ISP
+ip address 209.89.100.242  255.255.255.252
+no shut
+
+int s0/0/1
+desc INTERFAZ QUE CONECTA A LA SUBRED VIOLETA CON RA
+ip address 192.168.255.245  255.255.255.252
+clock rate 128000
+! EL RELOJ SOLO SE ACTIVA EN INTERFACES DCE Y LOS VALORES
+! NUMERICOS DE 64000, 128000 o múltiplos de 64000
+! EL DCE ESTABLECE LA VELOCIDAD DE CONEXIÓN
+no shut
+
+int f0/0
+desc INTERFAZ DE LA SUBRED AZUL
+ip address 192.168.1.254  255.255.255.0
+no shut
+
+router rip
+ver 2
+! LA VERSIÓN 2 ME PERMITE TRABAJAR CON VLSM
+! RIP INTERCAMBIA INFORMACIÓN DEL ROUTER CON SUS VECINOS CADA
+! 30 SEGUNDOS PARA ACTUALIZAR LAS TABLAS
+
+network 192.168.1.0
+network 192.168.255.0
+! EL ROUTER FRONTERA PUBLICA LA INFORMACIÓN DE LAS REDES 
+! VIOLETA Y AZUL. NO SE PUBLICA LA RED NARANJA PARA REALIZAR EL 
+! INTERCAMBIO DE LA INFORMACIÓN. LO CONSEGUIMOS A TRAVÉS DE UNA
+! RUTA ESTÁTICA POR DEFAULT.
+! LA INTERFACE QUE REQUIERO HACER PASIVA ES LA FAST ETHERNET YA QUE NO 
+! TIENE CONECTADO OTRO ROUTER QUE QUIERA APRENDER RUTAS. 
+passive-interface fa0/0
+passive-interface s0/0/0 
+ESTA INTERFACE NO PARTICIPA EN EL INTERCAMBIO
+DE INFORMACIÓN CON EL PROTOCOLO DE RUTEO RIP. LA TABLA DE RUTEO
+NO SE ENVIA HACIA EL ISP.
+default-information originate
+! PARA RIP Y OSPF
+redistribute static
+no auto-summary
+
+EN EL ROUTER FRONTERA SE VA A CONFIGURAR UNA RUTA ESTÁTICA DIRECTAMENTE
+CONECTADA, UTILIZANDO MI PROPIA INTERFACE, YA QUE 
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+
+
+-------- Router A ---------
+enable
+config t
+hostname RA
+no ip domain-lookup
+service password-enc
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int s0/0/0
+desc INTERFZ QUE CONECTA CON RB
+ip address 192.168.255.249  255.255.255.252
+clock rate 128000
+no shut
+
+int s0/0/1
+desc INTERFAZ QUE CONECTA CON RFrontera
+ip address 192.168.255.246  255.255.255.252
+no shut
+
+int f0/0
+desc INTERFAZ CON LA SUBRED AMARILLA
+ip address 192.168.3.254 255.255.255.0 
+no shut
+
+router rip
+ver 2
+network 192.168.255.0
+network 192.168.3.0
+passive-interface fa0/0
+no auto-summary
+
+-------- Router B ---------
+enable
+config t
+hostname RB
+no ip domain-lookup
+service password-enc
+
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int s0/0/0
+des INTERFAZ CON EL RA
+ip address 192.168.255.250 255.255.255.252
+no shut
+
+int f0/0
+desc INTERFAZ DE LA SUBRED /25
+ip address 192.168.2.126 255.255.255.128  
+no shut
+
+int f0/1
+desc INTERFAZ DE LA SUBRED /26
+ip address 192.168.2.190 255.255.255.192 
+no shut
+
+router rip
+ver 2
+network 192.168.2.0
+network 192.168.255.0
+passive-interface fa0/0
+passive-interface fa0/1
+no auto-summary
+
+-------- Switch 1 ---------
+enable
+config t
+hostname S1
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+! INTERCONEXIÓN POR TELNET
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address  192.168.2.189   255.255.255.192
+no shut
+
+ip  default-gateway  192.168.2.190
+
+-------- Switch 2 ---------
+enable
+config t
+hostname S2
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address  192.168.2.125  255.255.255.128
+no shut
+
+ip  default-gateway  192.168.2.126
+
+-------- Switch 3 ---------
+enable
+config t
+hostname S3
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address  192.168.3.253  255.255.255.0
+no shut
+
+ip  default-gateway  192.168.3.254
+
+-------- Switch 4 ---------
+enable
+config t
+hostname S4
+no ip domain-lookup
+enable secret class
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address  192.168.1.253  255.255.255.0
+no shut
+
+ip  default-gateway  192.168.1.254
+

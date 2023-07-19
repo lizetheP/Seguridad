@@ -1,0 +1,87 @@
+
+---------------------------------------------------------------
+Configuración parcial del router MyNewRouter
+---------------------------------------------------------------
+ena
+config t
+hostname MyNewRouter
+enable secret class
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/0
+ip add 192.168.10.253 255.255.255.252
+no shut
+
+--- En esta sección debes incluir la configuración de las Subinterfaces ---
+int g0/1.10
+description VLAN Home Office
+encapsulation dot1q 10
+! dot1q protocolo aceptado para intercambio de vlans
+ip add 192.168.10.126 255.255.255.128
+
+int g0/1.20
+description VLAN Entretenimiento
+encapsulation dot1q 20
+ip add 192.168.10.190 255.255.255.192
+
+int g0/1
+no shut
+
+!--------------------------------------------------------------------------------------------------
+
+ip route 0.0.0.0 0.0.0.0 g0/0
+
+
+-----------------------------------------------------
+Configuración parcial del switch S-NewVLANs
+-----------------------------------------------------
+ena
+config t
+hostname S-NewVLANs 
+enable secret class
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+-- En esta sección agregar los comandos de configuración de VLANs --
+-----------------------------------------------------------------------------------------------
+
+! Creación de las VLANs con nombre.  
+vlan 10
+name HomeOffice
+exit
+
+interface range f0/1-15
+switchport mode access
+!Datos y no troncal
+switchport access vlan 10
+
+vlan 20
+name Entretenimiento
+exit
+
+interface range f0/16-24
+switchport mode access
+switchport access vlan 20
+
+!DEFINIR PUERTO TRONCAL G0/1
+! Definición del o los puertos TRUNK
+interface  g0/1
+switchport mode trunk
+no shut

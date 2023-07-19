@@ -1,0 +1,71 @@
+! ROUTER A
+
+hostname RA
+
+router rip
+version 2
+passive-interface g0/1
+no auto-summary
+
+int g0/1
+ip helper-address 10.0.7.254
+
+int g0/1
+ip nat inside
+
+int s0/1/0
+ip nat inside
+
+! ROUTER B
+
+hostname RB
+
+router rip
+version 2
+passive-interface g0/1
+passive-interface s0/1/0
+no auto-summary
+
+ip dhcp excluded-address 10.0.1.254
+ip dhcp excluded-address 10.0.7.254
+
+ip dhcp pool RB_G0/1
+network 10.0.4.0 255.255.252.0
+default-router 10.0.7.254
+
+ip dhcp pool RA_G0/1
+network 10.0.0.0 255.255.254.0
+default-router 10.0.1.254
+
+! CONFIGURACIÓN PAT
+
+! DEFINICIÓN DE POOL DE DIRECCIONES PÚBLICAS
+ip nat pool MyPool 65.10.8.68 65.10.8.95 netmask 255.255.255.224
+access-list 1 permit any
+ip nat inside source list 1 pool MyPool overload
+
+int s0/1/1
+ip nat inside
+
+int g0/1
+ip nat inside
+
+int s0/1/0
+ip nat outside
+
+
+
+!access-list 1 permit 10.0.0.0 0.255.255.255
+
+
+
+
+
+
+
+
+
+
+
+
+

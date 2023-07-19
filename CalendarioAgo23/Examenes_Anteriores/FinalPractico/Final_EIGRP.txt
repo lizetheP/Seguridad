@@ -1,0 +1,221 @@
+! ==========================
+! ====== RMedicos ======
+! ==========================
+
+ena
+config t
+hostname RMedicos
+
+no ip domain-lookup
+
+service password-encryption
+
+enable secret class
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/0
+ip address 192.168.1.158 255.255.255.224
+ip helper-address 192.168.1.186
+ip nat inside
+no shut
+
+int s0/0/0
+ip address 192.168.1.185 255.255.255.252
+ip nat inside
+no shut
+
+router eigrp 100
+network 192.168.1.128 0.0.0.31
+network 192.168.1.184 0.0.0.3
+passive-int g0/0
+
+router ospf 100
+network 192.168.1.128 0.0.0.31 area 0
+network 192.168.1.184 0.0.0.3 area 0
+passive-int g0/0
+
+! ==========================
+! ======= RClinica =======
+! ==========================
+
+ena
+config t
+hostname RClinica
+
+no ip domain-lookup
+
+service password-encryption
+
+enable secret class
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/0
+ip address 192.168.1.174 255.255.255.240
+ip nat inside
+no shut
+
+int g0/1
+ip address 192.168.1.126 255.255.255.128
+ip nat inside
+no shut
+
+int s0/0/0
+ip address 200.0.1.241 255.255.255.252
+ip nat outside
+ip access-group 110 out
+no shut
+
+int s0/0/1
+ip address 192.168.1.186 255.255.255.252
+ip nat inside
+clock rate 128000
+no shut
+
+router eigrp 100
+network 192.168.1.0 0.0.0.127
+network 192.168.1.160 0.0.0.15
+network 192.168.1.184 0.0.0.3
+passive-int g0/0
+passive-int g0/1
+passive-int s0/0/0
+redistribute static
+
+router ospf 100
+network 192.168.1.0 0.0.0.127 area 0
+network 192.168.1.160 0.0.0.15 area 0
+network 192.168.1.184 0.0.0.3 area 0
+passive-int g0/0
+passive-int g0/1
+passive-int s0/0/0
+default-information originate
+
+! DHCP Exceptions
+ip dhcp excluded-address 192.168.1.126
+ip dhcp excluded-address 192.168.1.157 192.168.1.158
+ip dhcp excluded-address 192.168.1.173 192.168.1.174
+
+! **** DHCP Pools ****
+!---------------------------------------------------
+ip dhcp pool Pool_Pacientes
+network 192.168.1.0 255.255.255.128
+default-router 192.168.1.126
+
+ip dhcp pool Pool_Medicos
+network 192.168.1.128 255.255.255.224
+default-router 192.168.1.158
+
+ip dhcp pool Pool_Administrativos
+network 192.168.1.160 255.255.255.240
+default-router 192.168.1.174
+
+! **** Nat Static Server Administrativos ****
+ip nat inside source static 192.168.1.173 160.3.3.64
+
+
+! **** Nat Pool ****
+ip nat pool MyPool 160.3.3.65 160.3.3.95 netmask 255.255.255.224
+access-list 1 permit 192.168.1.0 0.0.0.255
+ip nat inside source list 1 pool MyPool overload
+
+! Redirect unknown address to ISP
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+! Lista de acceso extendida
+access-list 110 deny tcp any host 20.2.2.2 eq 80
+access-list 110 permit ip any any
+
+!RClinica
+int s0/0/0 
+ip access-group 110 out
+
+! ==========================
+! ====== SMedicos ======
+! ==========================
+
+ena
+config t
+hostname SMedicos
+
+no ip domain-lookup
+
+service password-encryption
+
+enable secret class
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+int vlan 1
+ip address 192.168.1.157 255.255.255.224
+no shut
+
+ip default-gateway 192.168.1.158
+
+! ==========================
+! ====== ISP ======
+! ==========================
+
+ena
+config t
+hostname ISP
+
+no ip domain-lookup
+
+service password-encryption
+
+enable secret classliz
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password ciscoliz
+login
+logging sync
+
+line vty 0 4
+password ciscoliz
+login
+
+int g0/0
+ip address 100.1.1.2 255.0.0.0
+no shut
+
+int g0/1
+ip address 20.2.2.1 255.0.0.0
+no shut
+
+int s0/0/0
+ip address 200.0.1.242 255.255.255.252
+clock rate 128000
+no shut
+
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+ip route 160.3.3.64 255.255.255.224 s0/0/0

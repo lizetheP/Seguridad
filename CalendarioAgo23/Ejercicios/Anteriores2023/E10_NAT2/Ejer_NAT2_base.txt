@@ -1,0 +1,45 @@
+---------------------------------------------------------------
+Configuración del router A
+---------------------------------------------------------------
+en
+config t
+
+hostname RFrontera
+
+no ip domain-lookup
+
+interface G0/0
+ip address 192.168.0.142 255.255.255.240
+no shut
+
+interface G0/1
+ip address 192.168.0.150 255.255.255.248
+no shut
+
+interface Serial0/0/0
+description Interfaz que conecta con ISP
+ip address 65.255.255.253 255.255.255.252
+no shut
+
+ip route 0.0.0.0 0.0.0.0 Serial0/0/0 
+
+NAT PURO
+---------
+
+ip nat pool MyPool 65.100.255.128 65.100.255.133 netmask 255.255.255.248
+ip nat inside source list 1 pool MyPool overload
+ip nat inside source static 192.168.0.130 65.100.255.135 
+ip nat inside source static 192.168.0.145 65.100.255.134
+access-list 1 permit 192.168.0.0 0.0.0.255
+
+ip route 0.0.0.0 0.0.0.0 Serial0/0/0 
+
+int s0/0/0
+ip nat outside 
+!Interfaces de conexión con el exterior
+
+int g0/0
+ip nat inside
+
+int g0/1
+ip nat inside

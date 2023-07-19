@@ -1,0 +1,123 @@
+--------- R1 --------
+enable
+config t
+
+hostname R1
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+banner motd #Unauthorized access is prohibited#
+
+int S0/0/0
+ip address 10.1.1.1 255.255.255.252
+desc Conexion R2
+clock rate 128000
+no shut
+
+int g0/1
+ip add 172.30.10.1 255.255.255.0
+no shut
+
+router rip
+ver 2
+network 172.30.0.0
+network 10.0.0.0
+passive-interface g0/1
+
+
+-------- R2 -------
+enable
+config t
+
+hostname R2
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+banner motd #Unauthorized access is prohibited#
+
+int S0/0/0
+ip address 10.1.1.2 255.255.255.252
+desc Conexion R1
+no shut
+
+int S0/0/1
+ip address 10.2.2.2 255.255.255.252
+desc Conexion R3
+clock rate 128000
+no shut
+
+int g0/0
+ip add 209.165.201.1 255.255.255.0
+no shut
+
+! ruta estática por default directamente conectada.
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+! Hay que redistribuir la ruta estática
+
+router rip
+ver 2
+network 209.165.201.0
+network 10.0.0.0
+passive-interface g0/0
+
+
+-------- R3 ----------
+enable
+config t
+
+hostname R3
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+banner motd #Unauthorized access is prohibited#
+
+int S0/0/1
+ip address 10.2.2.1 255.255.255.252
+desc Conexion R2
+no shut
+
+int g0/1
+ip add 172.30.30.1 255.255.255.0
+no shut
+
+router rip
+ver 2
+network 172.30.0.0
+network 10.0.0.0
+passive-interface g0/1

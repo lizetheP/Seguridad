@@ -1,0 +1,28 @@
+Configuración (Información básica)
+Bloque amarillo : Home Office
+192.168.10.0 255.255.255.128
+default-router 192.168.10.126
+
+Bloque entretenimiento  : Entretenimiento
+192.168.10.128 255.255.255.192
+default-router 192.168.10.190
+
+! DHCP para la subred de HomeOffice
+ip dhcp excluded-address 192.168.10.1 192.168.10.4
+! Si las direcciones no son consecutivas tendría
+! que poner cuatro exclusiones.
+ip dhcp pool HomeOffice
+network 192.168.10.0 255.255.255.128
+default-router 192.168.10.126
+
+! OTRA ALTERNATIVA DHCP para la subred de HomeOffice
+! NO FUNCIONA PARA TODAS LA VERSIONES
+! ip dhcp excluded-address 192.168.10.1 192.168.10.4
+ip dhcp pool HomeOffice
+network 192.168.10.5 255.255.255.128
+default-router 192.168.10.126
+
+! DHCP para la subred de Entretenimiento
+ip dhcp pool Entretenimiento
+network 192.168.10.128 255.255.255.192
+default-router 192.168.10.190

@@ -1,0 +1,218 @@
+! ==========================
+! ====== RMedicos ======
+! ==========================
+
+ena
+config t
+hostname RMedicos
+
+no ip domain-lookup
+
+service password-encryption
+
+enable secret class
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/0
+ip address 192.168.1.158 255.255.255.224
+no shut
+
+int s0/0/0
+ip address 192.168.1.185 255.255.255.252
+no shut
+
+! DEFAULT ROUTE
+! ---------------------------------------------------------------
+!Create a default route from the Gateway router to the ISP router
+ip route 0.0.0.0 0.0.0.0 209.165.201.17
+! Interface to Swimming Pool
+int s0/1/0
+ip address 172.30.0.249 255.255.255.252
+clock rate 128000
+ip nat inside
+no shut
+
+! Interface to Switch
+int g0/0
+ip address 172.30.0.1 255.255.255.128
+ip nat inside
+no shut
+
+! Interface to Router Querétaro
+int g0/1
+ip address 172.30.0.253 255.255.255.252
+ip nat inside
+no shut
+
+! DHCP Exceptions
+ip dhcp excluded-address 172.30.0.1
+ip dhcp excluded-address 172.30.0.129
+
+! **** DHCP Pools ****
+! DHCP Swimming Pool
+ip dhcp pool PoolDHCP_Residencia
+network 172.30.0.0 255.255.255.128
+default-router 172.30.0.1
+
+! DHCP Switch
+ip dhcp pool PoolDHCP_Alberca
+network 172.30.0.128 255.255.255.192
+default-router 172.30.0.129
+
+! **** OSPF ****
+router ospf 400 
+network 172.30.0.248 0.0.0.3 area 0
+network 172.30.0.0 0.0.0.127 area 0
+network 172.30.0.252 0.0.0.3 area 0
+passive-interface g0/0
+
+! ==========================
+! ======= RClinica =======
+! ==========================
+
+ena
+config t
+hostname RClinica
+
+no ip domain-lookup
+
+service password-encryption
+
+enable secret class
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/0
+ip address 192.168.1.174 255.255.255.240
+no shut
+
+int g0/1
+ip address 192.168.1.126 255.255.255.128
+no shut
+
+int s0/0/1
+ip address 192.168.1.185 255.255.255.252
+clock rate 128000
+no shut
+
+int s0/0/0
+ip address 200.0.1.241 255.255.255.252
+no shut
+
+! Interface to Switch
+int g0/0
+ip address 192.168.200.97 255.255.255.248
+ip nat inside
+no shut
+
+! Interface to Router Guadalajara
+int g0/1
+ip address 172.30.0.254 255.255.255.252
+ip nat inside
+no shut
+
+! DHCP Exceptions
+ip dhcp excluded-address 192.168.200.1
+ip dhcp excluded-address 192.168.200.65
+
+! **** DHCP Pools ****
+! DHCP Oficinas
+!---------------------------------------------------
+ip dhcp pool PoolDHCP-ROficinas-G01
+network 192.168.200.0 255.255.255.192
+default-router 192.168.200.1
+
+! DHCP Punto de Venta
+!----------------------------------------
+ip dhcp pool PoolDHCP-ROficinas-G00
+network 192.168.200.64 255.255.255.224
+default-router 192.168.200.65
+
+! **** Nat Static ****
+ip nat inside source static 192.168.200.98 177.232.86.3
+ip nat inside source static 192.168.200.99 177.232.86.4
+
+! **** Nat Pool ****
+ip nat pool QroPool 177.232.86.3 177.232.86.7 netmask 255.255.255.248
+access-list 10 permit 192.168.200.0 0.0.0.255
+access-list 10 permit 172.30.0.0 0.0.0.255
+ip nat inside source list 10 pool QroPool overload
+
+! **** EIGRP ****
+router eigrp 200
+redist static
+network 192.168.200.96 0.0.0.7
+network 192.168.200.248 0.0.0.3
+passive-int g0/0
+passive-int s0/0/0
+passive-int g0/1
+redist ospf 400
+
+router ospf 400
+default-information originate
+network 172.30.0.252 0.0.0.3 area 0
+passive-int s0/0/0
+passive-int s0/1/0
+passive-int g0/0
+redist eigrp 200
+
+! Redirect unknown address to Telmex
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+! ==========================
+! ====== ISP ======
+! ==========================
+
+ena
+config t
+hostname ISP
+
+no ip domain-lookup
+
+service password-encryption
+
+enable secret class
+
+banner motd # Unauthorized access is strictly prohibited. #
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+int g0/0
+ip address 100.1.1.2 255.0.0.0
+no shut
+
+int g0/1
+ip address 20.2.2.1 255.0.0.0
+no shut
+
+int s0/0/0
+ip address 200.0.1.242 255.255.255.252
+clock rate 128000
+no shut
+

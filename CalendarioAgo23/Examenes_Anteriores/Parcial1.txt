@@ -1,0 +1,141 @@
+--------- ISP --------
+enable
+config t
+
+hostname ISP
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int S0/1/0
+ip address 220.0.5.73 255.255.255.252
+clock rate 128000
+no shut
+
+int g0/0/1
+ip add 13.1.1.254 255.0.0.0
+no shut
+
+ip route 215.1.1.32 255.255.255.240 s0/1/0
+ip route 200.2.2.8 255.255.255.248 s0/1/0
+
+
+-------- RAdmin -------
+enable
+config t
+
+hostname RAdmin
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int S0/1/1
+description La conexion con el RAlumnos 
+ip address 200.2.2.66 255.255.255.248
+no shut
+
+int S0/1/0
+description La conexion con el RAdmin 
+ip address 220.0.5.74 255.255.255.252
+no shut
+
+int g0/0/1
+description SubredAmarilla
+ip add 200.2.2.9 255.255.255.248
+no shut
+
+ip route 0.0.0.0 0.0.0.0 s0/1/0
+
+router ospf 1
+network 200.2.2.64 0.0.0.7 area 0
+network 200.2.2.8 0.0.0.7 area 0
+default-information originate
+passive-interface s0/1/0
+passive-interface g0/0/1
+
+
+-------- RAlumnos ----------
+enable
+config t
+
+hostname RAlumnos
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int S0/1/0
+description conexion con RAdmin
+ip address 200.2.2.65 255.255.255.248
+clock rate 128000
+no shut
+
+int g0/0/0
+description Subred VerdeDer
+ip add 215.1.1.33 255.255.255.240
+no shut
+
+router ospf 2
+network 215.1.1.32 0.0.0.15 area 0
+network 200.2.2.64 0.0.0.7 area 0
+passive-interface g0/0/0
+
+
+-------- S_Alumnos ----------
+enable
+config t
+
+hostname S_Alumnos
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 15
+password cisco
+login
+
+enable password class
+
+int vlan 1
+ip address 215.1.1.46 255.255.255.240
+no shut
+
+ip default-gateway 215.1.1.33
+
