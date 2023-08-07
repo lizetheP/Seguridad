@@ -1,10 +1,14 @@
---------- MyISP --------
+--------- ISP --------
 Ya Configurado !!!!
 
+ip route 192.16.15.0 255.255.255.240 S0/1/0
+ip route 200.1.2.0 255.255.255.128 S0/1/0
+
+-------- RF -------
 enable
 config t
 
-hostname MyISP
+hostname RF
 
 !Encriptar passwords
 service password-enc
@@ -27,39 +31,39 @@ logging sync
 ! Password para entrar a modo privilegiado
 enable secret class
 
-interface G0/0
-ip address 151.101.1.126 255.255.255.192
-no shut
-
-interface S0/0/0
-description La conexion con el RFrontera
-ip address 134.89.254.241 255.255.255.252
+interface Serial0/1/0
+ip address 10.1.1.1 255.255.255.252
 clock rate 128000
 no shut
+exit
 
-no ip route 196.128.11.0 255.255.255.0 Serial0/0/0 
-no ip route 221.57.1.0 255.255.255.0 Serial0/0/0 
+interface Serial0/1/1
+description Enlace a R2
+ip address 10.1.1.5 255.255.255.252
+clock rate 128000
+no shut
+exit
 
-ip route 196.128.11.0 255.255.255.0 Serial0/0/0 
-ip route 221.57.1.0 255.255.255.0 Serial0/0/0 
+interface Serial0/2/0
+ip address 209.165.200.225 255.255.255.224
+no shut
+exit
 
--------- RFrontera -------
+ip route 0.0.0.0 0.0.0.0 Serial0/2/0
+ip route 192.16.15.0 255.255.255.240 s0/1/0
+ip route 200.1.2.0 255.255.255.128 s0/1/1
+
+-------- R1 ----------
 enable
 config t
 
-hostname RF
+hostname R1 
 
 !Encriptar passwords
 service password-enc
 
 ! Desactivar DNS
 no ip domain-lookup
-! Me equivoco en algún comando y el sistema operativo
-! trata de traducir ese comando como un nombre de 
-! dominio con el servidor dns. Pero en un ambiente
-! local no tenemos servidor dns. Evite el dns intente
-! traducir ese comando incorrecto como un nombre
-! de dominio que no va a encontrar
 
 ! Password de la consola
 line con 0
@@ -74,46 +78,34 @@ login
 logging sync
 
 ! Password para entrar a modo privilegiado
-!enable secret class
-enable password class
+enable secret class
 
-int S0/0/0
-desc Interfaz con ISP
-ip address 134.89.254.242 255.255.255.252
+interface Serial0/1/0
+ip address 10.1.1.2 255.255.255.252
 no shut
+exit
 
-int S0/0/1
-description Interfaz con RA
-ip address 198.68.1.249 255.255.255.252 
-! A la interfaz DCE se establece el reloj 
-! Uno de los dos interfaces debe tener el reloj de
-! sincronia. COnexión hembra o macho, hay una punta
-! DCE. La interfaz que sincroniza la comunicación
+interface Serial0/1/1
+ip address 10.1.1.9 255.255.255.252
 clock rate 128000
 no shut
+exit
 
-int g0/0
-desc Interfaz de la subred Amarillo
-ip address 221.57.1.254 255.255.255.0
+int g0/0/0
+desc Subred R1
+ip address 192.16.15.14 255.255.255.240
 no shut
 
-ip route 151.101.1.64 255.255.255.192 s0/0/0 
-!directamente conectada
-!ip route 151.101.1.64 255.255.255.192 134.89.254.241 recursiva
-!ip route 151.101.1.64 255.255.255.192 s0/0/0 134.89.254.241 completamente conectada
-
-!ip route 196.128.11.0 255.255.255.192 s0/0/1
-!ip route 196.128.11.128 255.255.255.192 s0/0/1
-!O Sumarizo ambas subredes 196.128.11.0000 0000 SUPRANETEO   
-!                          196.128.11.1000 0000
-ip route 196.128.11.0 255.255.255.0 s0/0/1 
+ip route 64.100.1.0 255.255.255.0 S0/1/0
+ip route 200.1.2.0 255.255.255.128 S0/1/1
 
 
--------- RA ----------
+-------- R2 ----------
 enable
 config t
 
-hostname RA 
+hostname R2
+
 
 !Encriptar passwords
 service password-enc
@@ -124,10 +116,7 @@ no ip domain-lookup
 ! Password de la consola
 line con 0
 password cisco
-! Es para que salga el prompt pidiéndome el password
 login
-! La consola está mostrando mensajes de error y se pierde mi comando.
-! AL terminar el mensaje aparezca mi comando en la última línea
 logging sync
 
 ! Conexión TELNET o para configurar SSH
@@ -137,33 +126,20 @@ login
 logging sync
 
 ! Password para entrar a modo privilegiado
-!enable secret class
-enable password class
+enable secret class
 
-! DTE no necesita configuración de la velocidad del reloj
-! Interfaz DTE
-int S0/0/0
-description Interface DTE para conectar con el RF
-ip address 198.68.1.250 255.255.255.252
-! Encender la interface, todas las interfaces del router están apagadas
+interface Serial0/1/0
+ip address 10.1.1.10 255.255.255.252
 no shut
 
-int g0/0
-description Subred del lado izquierdo
-ip address 196.128.11.62 255.255.255.192
+interface Serial0/1/1
+ip address 10.1.1.6 255.255.255.252
 no shut
 
-int g0/1
-description Subred del lado derecho
-ip address 196.128.11.190 255.255.255.192
+int g0/0/0
+desc Subred R2
+ip address 200.1.2.126 255.255.255.128
 no shut
 
-! RUTAS ESTÁTICAS
-! Rutas directamente conectadas
-!ip route 221.57.1.0 255.255.255.0 s0/0/0
-ip route 151.101.1.64 255.255.255.192 s0/0/0
-! Ruta recursiva
-ip route 221.57.1.0 255.255.255.0 198.68.1.249
-ip route 134.89.254.240 255.255.255.252 198.68.1.249
-
-
+ip route 64.100.1.0 255.255.255.0 S0/1/1
+ip route 192.16.15.0 255.255.255.240 S0/1/0

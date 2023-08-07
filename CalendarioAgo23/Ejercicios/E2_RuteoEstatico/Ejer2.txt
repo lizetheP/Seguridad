@@ -1,7 +1,7 @@
---------- MyISP --------
+--------- ISP --------
 Ya Configurado !!!!
 
--------- RFrontera -------
+-------- RF -------
 enable
 config t
 
@@ -28,16 +28,11 @@ logging sync
 ! Password para entrar a modo privilegiado
 enable secret class
 
-int g0/0
-desc Interfaz de la subred Amarillo
-ip address 221.57.1.254 255.255.255.0
-no shut
-
--------- RA ----------
+-------- R1 ----------
 enable
 config t
 
-hostname RA 
+hostname R1 
 
 !Encriptar passwords
 service password-enc
@@ -60,12 +55,48 @@ logging sync
 ! Password para entrar a modo privilegiado
 enable secret class
 
-int g0/0
-description Subred del lado izquierdo
-ip address 196.128.11.62 255.255.255.192
+interface Serial0/1/0
+ip address 10.1.1.2 255.255.255.252
+no shut
+exit
+
+interface Serial0/1/1
+ip address 10.1.1.9 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+-------- R2 ----------
+enable
+config t
+
+hostname R2
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+interface Serial0/1/0
+ip address 10.1.1.10 255.255.255.252
 no shut
 
-int g0/1
-description Subred del lado derecho
-ip address 196.128.11.190 255.255.255.192
+interface Serial0/1/1
+ip address 10.1.1.6 255.255.255.252
 no shut
