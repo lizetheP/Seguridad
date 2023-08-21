@@ -32,6 +32,7 @@ logging sync
 enable secret class
 
 interface Serial0/1/0
+description Enlace a R1
 ip address 10.1.1.1 255.255.255.252
 clock rate 128000
 no shut
