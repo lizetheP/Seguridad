@@ -1,4 +1,4 @@
-
+! OSPF
 -------- ROeste -------
 enable
 config t
@@ -115,49 +115,3 @@ network 200.3.4.192 0.0.0.63 area 0
 passive-interface g0/0
 
 end
-
--------------------------------------------
-enable
-config t
-
-hostname ISP
-
-service password-enc
-
-no ip domain-lookup
-
-line con 0
-password lalito
-login
-logging sync
-
-line vty 0 4
-password lalito
-login
-logging sync
-
-enable password armando
-
-int S0/0/0
-ip address 220.7.8.65 255.255.255.224
-no shut
-
-int Lo0
-ip address 3.3.3.3 255.0.0.0
-no shut
-
-int g0/0
-ip address 208.65.153.1 255.255.255.0
-no shut
-
-int g0/1
-ip address 157.166.0.1  255.255.0.0
-no shut
-
-ip route 195.50.6.160 255.255.255.252 s0/0/0
-ip route 195.50.6.176 255.255.255.252 s0/0/0
-ip route 190.1.2.128 255.255.255.128 s0/0/0
-ip route 200.3.4.192 255.255.255.192 s0/0/0
-
-end
-

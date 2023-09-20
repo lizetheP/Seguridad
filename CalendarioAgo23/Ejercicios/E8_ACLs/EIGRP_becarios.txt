@@ -1,4 +1,4 @@
-
+!EIGRP
 -------- ROeste -------
 enable
 config t
@@ -28,7 +28,7 @@ ip address 190.1.2.129 255.255.255.128
 no shut
 exit
 
-router ospf 1
+router eigrp 1
 network 190.1.2.128 0.0.0.127 area 0 
 network 195.50.6.160 0.0.0.3 area 0
 passive-interface g0/0
@@ -71,11 +71,11 @@ exit
 
 ip route 0.0.0.0 0.0.0.0 s0/1/1
 
-router ospf 2
+router eigrp 1
 network 195.50.6.160 0.0.0.3 area 0
 network 195.50.6.176 0.0.0.3 area 0
 passive-interface s0/1/1
-default-information originate
+redistribute static
 
 end
 
@@ -109,55 +109,9 @@ ip address 195.50.6.177 255.255.255.252
 no shut
 exit
 
-router ospf 1
+router eigrp 1
 network 195.50.6.176 0.0.0.3 area 0 
 network 200.3.4.192 0.0.0.63 area 0
 passive-interface g0/0
 
 end
-
--------------------------------------------
-enable
-config t
-
-hostname ISP
-
-service password-enc
-
-no ip domain-lookup
-
-line con 0
-password lalito
-login
-logging sync
-
-line vty 0 4
-password lalito
-login
-logging sync
-
-enable password armando
-
-int S0/0/0
-ip address 220.7.8.65 255.255.255.224
-no shut
-
-int Lo0
-ip address 3.3.3.3 255.0.0.0
-no shut
-
-int g0/0
-ip address 208.65.153.1 255.255.255.0
-no shut
-
-int g0/1
-ip address 157.166.0.1  255.255.0.0
-no shut
-
-ip route 195.50.6.160 255.255.255.252 s0/0/0
-ip route 195.50.6.176 255.255.255.252 s0/0/0
-ip route 190.1.2.128 255.255.255.128 s0/0/0
-ip route 200.3.4.192 255.255.255.192 s0/0/0
-
-end
-
