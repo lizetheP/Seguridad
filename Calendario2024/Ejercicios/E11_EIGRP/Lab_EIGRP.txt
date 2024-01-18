@@ -1,0 +1,132 @@
+---------------------------------------------
+ROUTER R1
+---------------------------------------------
+en
+config t
+
+hostname R1
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+exit
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+exit
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+banner motd # Prohibido el acceso #
+
+interface G0/0/0
+description R1 LAN
+ip address 192.168.1.1 255.255.255.0
+no shut
+exit
+
+interface S0/1/0
+description Link to R2
+ip address 10.1.1.1 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface S0/1/1
+description Link to R3
+ip address 10.3.3.1 255.255.255.252
+no shut
+exit
+--------------------------------------------
+ROUTER R2
+--------------------------------------------
+en
+config t
+
+hostname R2
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+exit
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+exit
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+interface G0/0/0
+description R2 LAN
+ip address 192.168.2.1 255.255.255.0
+no shut
+exit
+
+interface S0/1/0
+description Link to R1
+ip address 10.1.1.2 255.255.255.252
+no shut
+exit
+
+interface S0/1/1
+description Link to R3
+ip address 10.2.2.2 255.255.255.252
+clock rate 64000
+no shut
+exit
+----------------------------------------------
+ROUTER R3
+----------------------------------------------
+
+en
+config t
+
+hostname R3
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+exit
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+exit
+
+interface G0/0/0
+description R3 LAN
+ip address 192.168.3.1 255.255.255.0
+no shut
+exit
+
+interface S0/1/0
+description Link to R1
+ip address 10.3.3.2 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface S0/1/1
+description Link to R2
+ip address 10.2.2.1 255.255.255.252
+no shut
+exit
