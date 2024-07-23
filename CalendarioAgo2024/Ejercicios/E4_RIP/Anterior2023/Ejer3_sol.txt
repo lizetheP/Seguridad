@@ -1,0 +1,127 @@
+--------- MyISP --------
+Ya Configurado !!!!
+
+-------- RFrontera -------
+enable
+config t
+
+hostname RF
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+! Me equivoco en algún comando y el sistema operativo
+! trata de traducir ese comando como un nombre de 
+! dominio con el servidor dns. Pero en un ambiente
+! local no tenemos servidor dns. Evite el dns intente
+! traducir ese comando incorrecto como un nombre
+! de dominio que no va a encontrar
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+!enable secret class
+enable password class
+
+int S0/0/0
+desc Interfaz con ISP
+ip address 134.89.254.242 255.255.255.252
+no shut
+
+int S0/0/1
+description Interfaz con RA
+ip address 198.68.1.249 255.255.255.252 
+! A la interfaz DCE se establece el reloj 
+! Uno de los dos interfaces debe tener el reloj de
+! sincronia. COnexión hembra o macho, hay una punta
+! DCE. La interfaz que sincroniza la comunicación
+clock rate 128000
+no shut
+
+int g0/0
+desc Interfaz de la subred Amarillo
+ip address 221.57.1.254 255.255.255.0
+no shut
+
+ip route 151.101.1.64 255.255.255.192 s0/0/0 
+!directamente conectada
+!ip route 151.101.1.64 255.255.255.192 134.89.254.241 recursiva
+!ip route 151.101.1.64 255.255.255.192 s0/0/0 134.89.254.241 completamente conectada
+
+!ip route 196.128.11.0 255.255.255.192 s0/0/1
+!ip route 196.128.11.128 255.255.255.192 s0/0/1
+!O Sumarizo ambas subredes 196.128.11.0000 0000 SUPRANETEO   
+!                          196.128.11.1000 0000
+ip route 196.128.11.0 255.255.255.0 s0/0/1 
+
+
+-------- RA ----------
+enable
+config t
+
+hostname RA 
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+! Es para que salga el prompt pidiéndome el password
+login
+! La consola está mostrando mensajes de error y se pierde mi comando.
+! AL terminar el mensaje aparezca mi comando en la última línea
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+!enable secret class
+enable password class
+
+! DTE no necesita configuración de la velocidad del reloj
+! Interfaz DTE
+int S0/0/0
+description Interface DTE para conectar con el RF
+ip address 198.68.1.250 255.255.255.252
+! Encender la interface, todas las interfaces del router están apagadas
+no shut
+
+int g0/0
+description Subred del lado izquierdo
+ip address 196.128.11.62 255.255.255.192
+no shut
+
+int g0/1
+description Subred del lado derecho
+ip address 196.128.11.190 255.255.255.192
+no shut
+
+! RUTAS ESTÁTICAS
+! Rutas directamente conectadas
+!ip route 221.57.1.0 255.255.255.0 s0/0/0
+ip route 151.101.1.64 255.255.255.192 s0/0/0
+! Ruta recursiva
+ip route 221.57.1.0 255.255.255.0 198.68.1.249
+ip route 134.89.254.240 255.255.255.252 198.68.1.249
+
+

@@ -1,0 +1,119 @@
+
+-------- RSitio1 -------
+enable
+config t
+
+hostname RSitio1
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 9
+password cisco
+login
+
+enable password class 
+
+int g0/1
+ip address 198.1.2.126 255.255.255.192
+no shut
+exit
+
+int S0/0/0
+ip address 193.40.5.241 255.255.255.252
+clock rate 128000
+no shut
+
+router rip
+v 2
+network 198.1.2.0 
+network 193.40.5.0
+passive-interface g0/1
+
+
+-------- RFrontera -------
+enable
+config t
+
+hostname RFrontera
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 9
+password cisco
+login
+
+enable password class 
+
+int S0/0/0
+ip address 193.40.5.242 255.255.255.252
+no shut
+
+int S0/1/0
+ip address 210.6.3.78 255.255.255.248
+no shut
+
+int S0/1/1
+ip address 193.40.5.146 255.255.255.252
+no shut
+exit
+
+ip route 0.0.0.0 0.0.0.0 s0/1/0
+
+router rip
+v2
+network 193.40.5.0
+passive-interface s0/1/0
+redistribute static / default-information originate
+
+end
+
+-------- RSitio2 ----------
+enable
+config t
+
+hostname RSitio2
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 9
+password cisco
+login
+
+enable password class 
+
+int g0/0
+ip address 210.2.3.238 255.255.255.240
+no shut
+exit
+
+int S0/0/0
+ip address 193.40.5.145 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+router rip
+v2
+network 193.40.5.0 
+network 210.2.3.0
+passive-interface g0/0
+
+end

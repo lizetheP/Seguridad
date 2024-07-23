@@ -1,0 +1,117 @@
+! OSPF
+-------- ROeste -------
+enable
+config t
+
+hostname ROeste
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 7
+password cisco
+login
+
+enable password class 
+
+int S0/0/0
+ip address 195.50.6.161 255.255.255.252
+no shut
+
+int g0/0
+ip address 190.1.2.129 255.255.255.128
+no shut
+exit
+
+router ospf 1
+network 190.1.2.128 0.0.0.127 area 0 
+network 195.50.6.160 0.0.0.3 area 0
+passive-interface g0/0
+
+-------- RFrontera -------
+enable
+config t
+
+hostname RFrontera
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 7
+password cisco
+login
+
+enable password class 
+
+int S0/0/0
+ip address 195.50.6.178 255.255.255.252
+clock rate 128000
+no shut
+
+int S0/1/0
+ip address 195.50.6.162 255.255.255.252
+clock rate 128000
+no shut
+
+int S0/1/1
+ip address 220.7.8.94 255.255.255.224
+clock rate 128000
+no shut
+exit
+
+ip route 0.0.0.0 0.0.0.0 s0/1/1
+
+router ospf 2
+network 195.50.6.160 0.0.0.3 area 0
+network 195.50.6.176 0.0.0.3 area 0
+passive-interface s0/1/1
+default-information originate
+
+end
+
+-------- REste ----------
+enable
+config t
+
+hostname REste
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 7
+password cisco
+login
+
+enable password class 
+
+int g0/0
+ip address 200.3.4.193 255.255.255.192
+no shut
+exit
+
+int S0/0/0
+ip address 195.50.6.177 255.255.255.252
+no shut
+exit
+
+router ospf 1
+network 195.50.6.176 0.0.0.3 area 0 
+network 200.3.4.192 0.0.0.63 area 0
+passive-interface g0/0
+
+end
