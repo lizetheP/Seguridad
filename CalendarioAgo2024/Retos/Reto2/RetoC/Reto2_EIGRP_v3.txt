@@ -1,0 +1,164 @@
+
+-------- RSitioA -------
+enable
+config t
+
+hostname RSitioA
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 5
+password cisco
+login
+
+enable password class 
+
+int g0/0
+ip address 195.3.4.62 255.255.255.224
+no shut
+exit
+
+int S0/0/1
+ip address 200.8.8.65 255.255.255.252
+no shut
+
+router eigrp 2024
+network 195.3.4.32 0.0.0.31 area 0 
+network 200.8.8.64 0.0.0.3 area 0
+passive-interface g0/0
+
+
+-------- RFrontera -------
+enable
+config t
+
+hostname RFrontera
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 6
+password cisco
+login
+
+enable password class 
+
+int S0/0/1
+ip address 200.8.8.73 255.255.255.252
+clock rate 128000
+no shut
+
+int S0/0/0
+ip address 215.5.5.174 255.255.255.240
+no shut
+
+int S0/1/1
+ip address 200.8.8.66 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+!no ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+
+router eigrp 2024
+network 200.8.8.64 0.0.0.3 area 0
+network 200.8.8.72 0.0.0.3 area 0
+passive-interface s0/0/0
+redistribute static
+
+end
+
+-------- RSitioB ----------
+enable
+config t
+
+hostname RSitioB
+
+service password-enc
+no ip domain lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 6
+password cisco
+login
+
+enable password class
+
+int g0/1
+ip address 220.7.4.14 255.255.255.248
+no shut
+exit
+
+int S0/0/1
+ip address 200.8.8.74 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+router eigrp 2024
+network 200.8.8.72 0.0.0.3 area 0 
+network 220.7.4.8 0.0.0.7 area 0
+passive-interface g0/1
+
+end
+
+-------------------------------------------
+enable
+config t
+
+hostname ISP
+
+service password-enc
+
+no ip domain-lookup
+
+line con 0
+password lalito
+login
+logging sync
+
+line vty 0 4
+password lalito
+login
+logging sync
+
+enable password armando
+
+int S0/0/1
+ip address 215.5.5.161 255.255.255.240
+no shut
+
+int Lo1
+ip address 4.2.2.2 255.0.0.0
+no shut
+
+int g0/0
+ip address 12.0.0.1 255.0.0.0
+no shut
+
+int g0/1
+ip address 192.0.2.1 255.255.255.0
+no shut
+
+ip route 220.7.4.8 255.255.255.248 s0/0/1
+ip route 195.3.4.32 255.255.255.224 s0/0/1
+
+end
+
