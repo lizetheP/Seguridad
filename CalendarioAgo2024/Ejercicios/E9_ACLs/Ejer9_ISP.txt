@@ -1,0 +1,34 @@
+en
+config t
+
+hostname ISP
+
+service password-encryption
+
+enable secret liz
+
+no ip domain-lookup
+
+interface g7/0
+ip address 151.101.0.1 255.255.0.0
+no shut
+
+interface g8/0
+ip address 31.0.0.1 255.0.0.0
+no shut
+
+interface g9/0
+ip address 104.0.0.1 255.0.0.0
+no shut
+
+interface serial2/0
+ip address 132.254.89.246 255.255.255.252
+clock rate 128000
+no shut
+
+ip route 132.254.89.0 255.255.255.0 Serial0/0/0 
+
+line con 0
+password ciscoliz
+login
+
