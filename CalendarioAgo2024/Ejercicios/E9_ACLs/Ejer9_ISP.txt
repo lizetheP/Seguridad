@@ -26,7 +26,7 @@ ip address 132.254.89.246 255.255.255.252
 clock rate 128000
 no shut
 
-ip route 132.254.89.0 255.255.255.0 Serial0/0/0 
+ip route 132.254.89.0 255.255.255.0 Serial2/0 
 
 line con 0
 password ciscoliz
