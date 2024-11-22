@@ -44,6 +44,24 @@ description Link to R3
 ip address 10.3.3.1 255.255.255.252
 no shut
 exit
+
+router eigrp 2024
+network 192.168.1.0 0.0.0.255
+network 10.1.1.0 0.0.0.3
+network 10.3.3.0 0.0.0.3
+passive-interface g0/0/0
+
+router rip
+v 2
+network 192.168.1.0
+network 10.0.0.0
+passive-interface g0/0/0
+
+255.255.255.255
+255.255.255.252
+-------------------
+0.0.0.3
+
 --------------------------------------------
 ROUTER R2
 --------------------------------------------
@@ -88,6 +106,22 @@ ip address 10.2.2.2 255.255.255.252
 clock rate 64000
 no shut
 exit
+
+router eigrp 2024
+network 192.168.2.0 0.0.0.255
+network 10.1.1.0 0.0.0.3
+network 10.2.2.0 0.0.0.3
+passive-interface g0/0/0
+
+! 172.16.180.0
+! network 172.16.0.0
+
+router rip
+v 2
+network 192.168.2.0
+network 10.0.0.0
+passive-interface g0/0/0
+
 ----------------------------------------------
 ROUTER R3
 ----------------------------------------------
@@ -130,3 +164,16 @@ description Link to R2
 ip address 10.2.2.1 255.255.255.252
 no shut
 exit
+
+router eigrp 2024
+network 192.168.3.0 0.0.0.255
+network 10.3.3.0 0.0.0.3
+network 10.2.2.0 0.0.0.3
+passive-interface g0/0/0
+
+router rip
+v 2
+network 192.168.3.0
+network 10.0.0.0
+passive-interface g0/0/0
+
