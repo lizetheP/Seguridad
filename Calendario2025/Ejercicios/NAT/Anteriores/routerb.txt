@@ -1,0 +1,43 @@
+hostname RB
+ip dhcp excluded-address 10.0.7.254
+ip dhcp excluded-address 10.0.1.254
+
+ip dhcp pool RB_G0/1
+network 10.0.4.0 255.255.252.0
+default-router 10.0.7.254
+
+ip dhcp pool RA_G0/1
+network 10.0.0.0 255.255.254.0
+default-router 10.0.1.254
+
+interface GigabitEthernet0/1
+ip address 10.0.7.254 255.255.252.0
+ip nat inside
+no shut
+
+interface Serial0/1/0
+ip address 65.10.8.66 255.255.255.224
+ip nat outside
+no shut
+exit
+
+interface Serial0/1/1
+ip address 10.0.3.129 255.255.255.252
+ip nat inside
+no shut
+exit
+
+router rip
+version 2
+redistribute static 
+passive-interface GigabitEthernet0/1
+passive-interface Serial0/1/0
+network 10.0.0.0
+no auto-summary
+exit
+
+ip nat pool Pool 65.10.8.68 65.10.8.95 netmask 255.255.255.224
+ip nat inside source list 2 pool Pool overload
+ip route 0.0.0.0 0.0.0.0 Serial0/1/0 
+
+access-list 2 permit any

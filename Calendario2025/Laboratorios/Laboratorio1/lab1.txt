@@ -1,0 +1,28 @@
+en
+config t
+
+hostname SUM
+
+no ip domain-lookup
+
+enable password class
+
+line con 0
+password cisco
+login
+logging synchronous
+
+line vty 0 4
+password cisco
+login
+logging synchronous
+
+service password-encryption
+
+banner motd #Prohibido el acceso sin autorizacion#
+
+interface vlan 1
+ip address 172.16.0.33 255.255.255.128
+no shutdown
+
+ip default-gateway 172.16.0.62

@@ -1,0 +1,38 @@
+!RFrontera
+!----------------------
+! Ruta por default hacia ISP1 directamente conectada
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+! Ruta por default hacia ISP2 directamente conectada
+ip route 0.0.0.0 0.0.0.0 s0/0/1 5
+
+! Ruta por default hacia ISP1 recursiva ipv6
+ipv6 route ::/0 2001:DB8:A:1::1
+
+! Ruta por default hacia ISP2 recursiva ipv6
+ipv6 route ::/0 2001:DB8:A:2::5 5
+
+!ISP1
+!------------------------------
+! Ruta estática siguiente salto hacia LAN 1 y LAN 2
+ip route 192.168.10.16 255.255.255.240 10.10.10.2
+ip route 192.168.11.32 255.255.255.224 10.10.10.2
+
+! Ruta estática directamente conectada hacia LAN 1 y LAN 2
+ip route 192.168.10.16 255.255.255.240 g0/0 5
+ip route 192.168.11.32 255.255.255.224 g0/0 5
+
+! Ruta estática siguiente salto hacia LAN 1 y LAN 2 ipv6
+ipv6 route 2001:DB8:1:10::/64 2001:DB8:A:1::2
+ipv6 route 2001:DB8:1:11::/64 2001:DB8:A:1::2
+
+! Ruta estática directamente conectada hacia LAN 1 y LAN 2 ipv6
+ipv6 route 2001:DB8:1:10::/64 g0/0 5
+ipv6 route 2001:DB8:1:11::/64 g0/0 5
+
+
+
+
+
+
+
