@@ -1,0 +1,178 @@
+--------- ISP -------------------------------
+Ya Configurado !!!!
+
+ip route 192.16.15.0 255.255.255.240 S0/1/0
+ip route 192.16.15.32 255.255.255.240 S0/1/0
+ip route 200.1.2.0 255.255.255.128 S0/1/0
+
+-------- RF ---------------------------------
+
+enable
+config t
+
+hostname RF
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+interface Serial0/1/0
+description Enlace a R1
+ip address 10.1.1.1 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+interface Serial0/1/1
+description Enlace a R2
+ip address 10.1.1.5 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+interface Serial0/2/0
+ip address 209.165.200.225 255.255.255.224
+no shut
+exit
+
+! Ruteo estático
+!------------------
+ip route 0.0.0.0 0.0.0.0 Serial0/2/0
+ip route 192.16.15.0 255.255.255.240 s0/1/0
+ip route 192.16.15.32 255.255.255.240 s0/1/0
+ip route 200.1.2.0 255.255.255.128 s0/1/1
+
+! RIP
+!------------------
+
+! EIGRP
+!------------------
+
+-------- R1 ---------------------------------
+enable
+config t
+
+hostname R1 
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+interface Serial0/1/0
+ip address 10.1.1.2 255.255.255.252
+no shut
+exit
+
+interface Serial0/1/1
+ip address 10.1.1.9 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+int g0/0/0
+desc Subred LAN 1
+ip address 192.16.15.14 255.255.255.240
+no shut
+
+int g0/0/1
+desc Subred LAN 2
+ip address 192.16.15.46 255.255.255.240
+no shut
+
+! Ruteo estático
+!------------------
+ip route 64.100.1.0 255.255.255.0 S0/1/0
+ip route 200.1.2.0 255.255.255.128 S0/1/0
+
+! RIP
+!------------------
+
+! EIGRP
+!------------------
+
+-------- R2 ---------------------------------
+
+enable
+config t
+
+hostname R2
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+interface Serial0/1/0
+ip address 10.1.1.10 255.255.255.252
+no shut
+
+interface Serial0/1/1
+ip address 10.1.1.6 255.255.255.252
+no shut
+
+int g0/0/0
+desc Subred LAN 3
+ip address 200.1.2.126 255.255.255.128
+no shut
+
+! Ruteo estático
+!------------------
+ip route 64.100.1.0 255.255.255.0 S0/1/1
+ip route 192.16.15.0 255.255.255.240 S0/1/1
+ip route 192.16.15.32 255.255.255.240 S0/1/1
+
+! RIP
+!------------------
+
+! EIGRP
+!------------------
