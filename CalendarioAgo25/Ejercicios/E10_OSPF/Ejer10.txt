@@ -1,4 +1,10 @@
 ------------------------------
+ISP
+------------------------------
+
+!Rutas estáticas para llegar a la red amarilla, azul y naranja
+
+
 Ruteador R1
 ------------------------------
 
