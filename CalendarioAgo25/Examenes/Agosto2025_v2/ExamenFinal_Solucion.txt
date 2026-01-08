@@ -1,4 +1,43 @@
 !----------------------
+! ISP
+!----------------------
+en
+config t
+
+hostname ISP
+
+enable secret class
+enable password class
+
+no ip domain-lookup
+
+interface G0/0
+ip address 100.1.1.2 255.0.0.0
+no shut
+
+interface G0/1
+ip address 20.2.2.1 255.0.0.0
+no shut
+
+interface S0/0/0
+ip address 200.0.1.242 255.255.255.252
+clock rate 128000
+no shut
+
+banner motd #Unauthorized access is strictly prohibited#
+
+line con 0
+password cisco
+logging synchronous
+login
+
+line vty 0 4
+password cisco
+logging synchronous
+login
+
+end
+!----------------------
 !Ruteador RHospital
 !----------------------
 

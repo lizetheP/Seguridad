@@ -1,0 +1,62 @@
+Muy buen trabajo estimado Marco, solamente tengo algunos comentarios:
+
+En RHospital, faltó hacer pasivas las interfaces g0/0 y  g0/1.
+Recuerda que la red que conecta a RHospital con el ISP no pertenece al hospital, por tal motivo no debe agregarse en la configuración del protocolo EIGRP en RHospital.
+
+Muy buen trabajo estimado Armando, solamente tengo un comentario:
+
+En RHospital, faltó hacer pasiva las interface s0/0/1, ya que no deseamos enviar tráfico de nuestro protocolo de ruteo al ISP.
+
+Excelente examen estimado Andre, felicidades!! 
+
+!--------------------------------------
+Ricardo Alejandro Andrade Robledo
+
+Excelente examen estimado Ricardo, felicidades!!
+
+!--------------------------------------
+Alejandra Arredondo
+
+Excelente examen estimada Alejandra, felicidades!!
+
+!--------------------------------------
+Alfredo Arriaga Morales
+
+Buen trabajo estimado Alfredo, solamente tengo algunos comentarios:
+
+Recuerda que la red que conecta a RBimbo con el ISP no pertenece a la empresa, por tal motivo no debe agregarse en la configuración del protocolo OSPF en RBimbo.
+En RBimbo, faltó hacer pasiva las interface g0/0.
+
+En RBimbo, faltó hacer pasiva las interface s0/0/0, ya que no deseamos enviar tráfico de nuestro protocolo de ruteo al ISP.
+No  hay evidencia de configuración de lista de acceso extendida.
+
+Faltó redistribuir la ruta por default de RBimbo hacia los routers internos de la empresa, por ese motivo el ruteador RDirectivos no sabe como salir al exterior. Faltó configurar redistribute static en el protocolo de ruteo en RBimbo.
+
+Con relación a la lista de control de acceso extendida, recuerda que la instrucción dice que las computadoras de la subred de EMPLEADOS no tengan acceso a la subred de DIRECTIVOS, no al equipo terminal de Directivos.
+access-list 110 remark impide trafico de Empleados hacia directivos
+access-list 110 deny tcp 180.40.240.0 0.0.15.0 host 170.50.224.0 eq 20
+access-list 110 deny tcp 180.40.240.0 0.0.15.0 host 170.50.224.0 eq 21
+access-list 110 permit ip any any
+CORRECTO
+access-list 110 remark impide trafico de Empleados hacia directivos
+access-list 110 deny tcp 180.40.240.0 0.0.15.0 170.50.224.0 0.0.3.255 eq 20
+access-list 110 deny tcp 180.40.240.0 0.0.15.0 170.50.224.0 0.0.3.255 eq 21
+access-list 110 permit ip any any
+
+En RDirectivos, es incorrecta la red que se agrega en OSPF, 
+network 172.50.224.0 0.0.3.255 area 0
+CORRECTO
+network 170.50.224.0 0.0.3.255 area 0
+
+no ip route 192.168.7.0 255.255.255.252 Serial0/0/0
+no ip route 192.168.7.0 255.255.255.252 Serial0/0/1
+no ip route 192.168.7.0 255.255.255.248 Serial0/0/0
+
+Buen trabajo estimada Lilian, solamente tengo algunos comentarios:
+
+En RBimbo, faltó hacer pasiva las interface s0/0/0, ya que no deseamos enviar tráfico de nuestro protocolo de ruteo al ISP.
+En RBimbo, faltó hacer pasiva las interface g0/0.
+Hizo pasiva la interface s0/0/1 de RBimbo, por lo cual se pierde la comunicación con el ruteador RDirectivos.
+
+no ip route 0.0.0.0 0.0.0.0 Serial0/0/1
+no ip route 170.50.224.0 255.255.252.0 Serial0/0/1
