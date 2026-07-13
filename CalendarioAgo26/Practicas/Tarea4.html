@@ -1,0 +1,1532 @@
+﻿<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+                 
+
+<head>
+<meta content="es-mx" http-equiv="Content-Language" />
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+ 
+ <title>Calendario</title>
+                                 
+  <style type="text/css">
+
+
+
+
+
+
+
+
+
+
+
+.style1 {
+
+
+
+
+
+
+
+
+
+
+
+	border-width: 1px;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style4 {
+
+
+
+
+
+
+
+
+
+
+
+	font-family: Arial;
+
+
+
+
+
+
+
+
+
+
+
+	font-weight: bold;
+
+
+
+
+
+
+
+
+
+
+
+	font-size: -1;
+
+
+
+
+
+
+
+
+
+
+
+	color: #FFFFFF;
+
+
+
+
+
+
+
+
+
+
+
+	text-align: center;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.Estilo13 {font-family: Arial, Helvetica, sans-serif; font-size: 14px; }
+
+
+
+
+
+
+
+
+
+
+
+.style6 {
+
+
+
+
+
+
+
+
+
+
+
+	font-family: Arial;
+
+
+
+
+
+
+
+
+
+
+
+	font-size: x-small;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style8 {
+
+
+
+
+
+
+
+
+
+
+
+	margin-left: 40px;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style12 {
+
+
+
+
+
+
+
+
+
+
+
+	border-left-color: #C0C0C0;
+
+
+
+
+
+
+
+
+
+
+
+	border-left-width: 1px;
+
+
+
+
+
+
+
+
+
+
+
+	border-right-width: 1px;
+
+
+
+
+
+
+
+
+
+
+
+	border-top-color: #C0C0C0;
+
+
+
+
+
+
+
+
+
+
+
+	border-top-width: 1px;
+
+
+
+
+
+
+
+
+
+
+
+	border-bottom-width: 1px;
+
+
+
+
+
+
+
+
+
+
+
+	background-color: #C0C0C0;
+
+
+
+
+
+
+
+
+
+
+
+	text-align: center;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style13 {
+
+
+
+
+
+
+
+
+
+
+
+	font-weight: bold;
+
+
+
+
+
+
+
+
+
+
+
+	border-width: 1px;
+
+
+
+
+
+
+
+
+
+
+
+	background-color: #C0C0C0;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style15 {
+
+
+
+
+
+
+
+
+
+
+
+	border-width: 1px;
+
+
+
+
+
+
+
+
+
+
+
+	text-align: center;
+
+
+
+
+
+
+
+
+
+
+
+	font-weight: bold;
+
+
+
+
+
+
+
+
+
+
+
+	background-color: #C0C0C0;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style16 {
+
+
+
+
+
+
+
+
+
+
+
+	border-width: 1px;
+
+
+
+
+
+
+
+
+
+
+
+	text-align: center;
+
+
+
+
+
+
+
+
+
+
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+.style19 {
+
+
+
+
+
+
+
+
+
+
+
+	font-family: Arial, Helvetica;
+
+
+
+
+
+
+
+
+
+
+
+	font-size: -1;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style21 {
+
+
+
+
+
+
+
+
+
+
+
+	text-align: center;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style22 {
+
+
+
+
+
+
+
+
+
+
+
+	font-family: Arial, Helvetica;
+
+
+
+
+
+
+
+
+
+
+
+	font-size: x-small;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style23 {
+
+
+
+
+
+
+
+
+
+
+
+	font-weight: bold;
+
+
+
+
+
+
+
+
+
+
+
+	border-width: 1px;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style24 {
+
+
+
+
+
+
+
+
+
+
+
+	text-align: left;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style27 {
+
+
+
+
+
+
+
+
+
+
+
+	text-align: left;
+
+
+
+
+
+
+
+
+
+
+
+	font-family: Arial;
+
+
+
+
+
+
+
+
+
+
+
+	font-size: -1;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style29 {
+
+
+
+
+
+
+
+
+
+
+
+	text-align: left;
+
+
+
+
+
+
+
+
+
+
+
+	font-family: Arial;
+
+
+
+
+
+
+
+
+
+
+
+	font-size: x-small;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style30 {
+
+
+
+
+
+
+
+
+
+
+
+	font-family: Arial;
+
+
+
+
+
+
+
+
+
+
+
+	font-weight: bold;
+
+
+
+
+
+
+
+
+
+
+
+	font-size: -1;
+
+
+
+
+
+
+
+
+
+
+
+	color: #FFFFFF;
+
+
+
+
+
+
+
+
+
+
+
+	text-align: left;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style31 {
+
+
+
+
+
+
+
+
+
+
+
+	border-width: 1px;
+
+
+
+
+
+
+
+
+
+
+
+	background-color: #C0C0C0;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style32 {
+
+
+
+
+
+
+
+
+
+
+
+	border-width: 1px;
+
+
+
+
+
+
+
+
+
+
+
+	text-align: center;
+
+
+
+
+
+
+
+
+
+
+
+	background-color: #C0C0C0;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style33 {
+
+
+
+
+
+
+
+
+
+
+
+	font-weight: normal;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.style34 {
+
+
+
+
+
+
+
+
+
+
+
+	font-family: Arial;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+  *{box-sizing:inherit}
+  
+
+
+
+
+
+
+
+
+
+
+  .auto-style5 {
+	  margin-left: 280px;
+  }
+  .auto-style6 {
+	  font-family: Arial, Helvetica, sans-serif;
+	  font-size: small;
+  }
+  
+
+
+
+
+
+
+
+
+
+
+  .auto-style13 {
+	line-height: 150%;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.auto-style14 {
+	color: #808000;
+	font-size: medium;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.auto-style16 {
+	color: #FFFFFF;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.auto-style17 {
+	color: #330033;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.auto-style19 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: medium;
+	color: #FFFFFF;
+}
+.auto-style20 {
+	border-width: 1px;
+	margin-left: 280px;
+	background-color: #510851;
+}
+.auto-style21 {
+	font-family: Arial, Helvetica, sans-serif;
+}
+  
+
+
+
+
+
+
+
+
+
+
+  .auto-style24 {
+	margin-left: 8px;
+	margin-right: 8px;
+}
+.auto-style25 {
+	margin-left: 4px;
+	margin-right: 4px;
+}
+.auto-style26 {
+	color: #000000;
+}
+.auto-style28 {
+	color: #000000;
+	font-size: medium;
+}
+  
+
+
+
+
+
+
+
+
+
+
+  .auto-style37 {
+	color: #510851;
+	font-size: large;
+	font-family: Arial, Helvetica, sans-serif;
+}
+  
+
+
+
+
+
+
+
+
+
+
+  .auto-style39 {
+	margin-left: 320px;
+}
+.auto-style43 {
+	color: #FFFFFF;
+	font-size: xx-small;
+}
+  
+
+
+
+
+
+
+
+
+
+
+  .auto-style76 {
+	font-size: medium;
+}
+.auto-style78 {
+	border-style: solid;
+	border-width: 1px;
+}
+  
+
+
+
+
+
+
+
+
+
+
+  .auto-style79 {
+	font-size: small;
+}
+.auto-style80 {
+	color: #000000;
+	font-size: small;
+}
+  
+
+
+
+
+
+
+
+
+
+
+  </style>
+</head>
+  <body>
+     
+<center>    
+<table border="1" cols="1" width="90%">
+     <tbody>
+      <tr>
+     <td class="auto-style20"><strong><br class="auto-style21">
+	 <span class="auto-style19">TC 2007B. Integración de seguridad informática 
+	 en redes y sistemas de software&nbsp;</span><br class="auto-style21"><span class="auto-style17">.</span></strong><span class="auto-style21">&nbsp;&nbsp;</span></td>
+     </tr>
+                 
+      <tr>
+     <td class="auto-style5">                             
+                                  
+      <table border="0" cols="2" width="100%">
+     <tbody>
+              <tr>
+      <td class="style21">
+	  <strong><span class="auto-style14"><br></span><span class="auto-style37">
+	  Tarea 4. Configuración de rutas estáticas y por default</span></strong>&nbsp;<br class="auto-style21"><span class="auto-style16">
+	  .</span></td>
+     </tr>
+                                         
+        </tbody>                            
+      </table>
+                                  
+     	 </td>
+     </tr>
+                 
+      <tr>
+     <td class="auto-style39"> 
+	 <span class="auto-style43">.</span><br> 
+	 <img src="../Laboratorios/Quevoyalograr.png" height="50" width="50" align="left"><b><font color="#330033" face="Arial,Helvetica"><br>
+	 <span class="auto-style26">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Objetivo:</span></font></b> 
+        &nbsp;                             
+      <ul>
+                                         
+        <ul>
+     <li class="auto-style6"> Configuración de rutas estáticas y por default IPv4 e IPv6.</li>
+			<li class="auto-style6"> Verificar conectividad. </li>
+                                         
+        </ul>
+                                 
+      </ul>
+                                  
+      <hr width="100%"> <b><font color="#330033" face="Arial,Helvetica">
+	 <img src="../Laboratorios/modalidad.png" height="50" width="50" align="left" class="auto-style24"><br>
+	 &nbsp; &nbsp;<span class="auto-style26">Modalidad: </span> </font></b>&nbsp;<ul>
+                                         
+         <ul>
+     		<li> <font
+ size="-1" color="#333333" face="Arial,Helvetica">Individual.</font></li>
+                                         
+        </ul>
+                                 
+      </ul>
+                               
+      <hr width="100%"> 
+          <img src="../Laboratorios/Instrucciones.png" height="50" width="50" align="left" class="auto-style25">&nbsp;
+     <br>
+          <font color="#330033" face="Arial,Helvetica">
+          <b><span class="auto-style26">&nbsp;&nbsp;&nbsp;&nbsp; Instrucciones:</span></b><ul>
+                                         
+         <ul>
+			 <li class="auto-style26"><font size="-1">Ejecuta la aplicación de
+			 <strong>Packet Tracer</strong>.</font><li class="auto-style26">
+			 <font size="-1">Abre el archivo
+			 <span class="auto-style79" style="color: rgb(238, 0, 0); font-family: Arial, sans-serif; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial;">
+			 <span style="color: windowtext;">
+			 <a href="2_Configure%20IPv4%20and%20IPv6%20Static%20and%20Default%20Routes.pka">
+			 <strong>2_Configure IPv4 and IPv6 Static and Default Routes.pka</strong></a></span></span></font><li class="auto-style26">
+			 <font size="-1">Configura tu <strong>User Profile</strong> con tu 
+			 nombre, correo y matrícula, como se muestra en la figura: </font>
+		 </ul>
+                                 
+      </ul>
+	 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	 <img class="auto-style78" src="img7.jpg"></p>
+	 <ul>
+                                         
+         <ul>
+			 <li class="auto-style26"><font size="-1">Lleva a cabo todas las 
+			 tareas que indica la práctica para que llegues al 100%.</font><li class="auto-style26">
+			 <font size="-1">Utiliza la línea de 
+			 comandos de cada equipo de interconexión y realiza la configuración.<strong><a href="Laboratorio1.docx"> 
+			 </a> </strong>
+			 </font>
+			 <li class="auto-style26"><font size="-1">Para comprobar la 
+			 configuración exitosa de cada equipo de interconexión de esta 
+			 práctica, realiza las pruebas de conectividad indicadas en la 
+			 descripción del laboratorio. </font>
+		 </ul>
+                                 
+      </ul>
+	  <span class="auto-style26">
+	  <class="auto-style48">
+	 <class="auto-style55">
+	 <class="auto-style48">
+	 </span>
+	 <class="auto-style51">
+	  <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style49">
+	  <class="auto-style48">
+	  <class="auto-style49">
+	  <class="auto-style51">
+	  <class="auto-style49">
+	  <class="auto-style48">
+	  <class="auto-style49">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style49">
+	  <class="auto-style48">
+	  <class="auto-style49">
+	  <class="auto-style51">
+	  <class="auto-style51">
+	  <class="auto-style49">
+	  <class="auto-style48">
+	  <class="auto-style49">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style48">
+	 <class="auto-style49">
+	 <class="auto-style49">
+	  <class="auto-style48">
+	  <class="auto-style49">
+	  <b><font size="-1" face="Arial,Helvetica">
+                                  
+      <hr width="100%">  
+                                  
+	 </font>
+			</b><font size="-1" face="Arial,Helvetica">
+	 	   <font size="-1">
+                                  
+			<p class="auto-style13"> 
+          <img src="../Laboratorios/preparacionalumno.png" height="50" width="50" align="left" class="auto-style25">&nbsp;
+     <br>
+          <b><font color="#330033" face="Arial,Helvetica">&nbsp;</font></b></font><b><font color="#330033" face="Arial,Helvetica"><span class="auto-style28">&nbsp;&nbsp;&nbsp; Recursos:</span></font></b></p>
+	 <font size="-1">
+                                  
+      	  <ul>
+      
+                                         
+        	  <ul>
+     			  <class="auto-style26">
+     			  <li> 
+													<font
+ face="Helvetica, Arial, sans-serif" size="-1" color="#663366">
+													<span class="auto-style80">
+													<a href="../Presentaciones/5_Ruteo_estatico.pptx">
+				  5. Ruteo estático</a></span></font><class="auto-style26"><font size="-1"></ul>
+	                                  
+      </ul>
+	      
+      <hr width="100%"> 
+	 <img src="../Laboratorios/Especificaciones.png" height="50" width="50" align="left">
+	 <br></span></font><span class="auto-style26">
+	 
+	  <font face="Arial,Helvetica"><span class="auto-style54">&nbsp;&nbsp;<span class="auto-style76"><strong>&nbsp;&nbsp;&nbsp; Especificaciones 
+	  de entrega</strong></span></span></font><font size="-1">
+                                  
+      	  <br>&nbsp;<ul>
+                                         
+         <ul>
+			 <li class="auto-style26">Formato de entrega: Un archivo <strong>pka
+			 </strong></li>
+			 <li class="auto-style26">Nombre de los entregables:<font color="#330033" face="Arial,Helvetica" size="-1"><strong>
+			 </strong><span class="auto-style26"><strong>2_Configure IPv4 and 
+			 IPv6 Static and Default Routes.pka</strong></span></font></li>
+			 <li class="auto-style26">Medio de entrega:&nbsp;Se entrega en la sección de&nbsp;<strong>Tarea 
+			 4. Configuración de rutas estáticas y por default</strong></li>
+		 </ul>
+                                 
+      </ul>
+	 <p><strong>NOTA:</strong> Realiza una impresión de pantalla de la practica 
+	 donde se aprecie tu "username" y correo" al mismo tiempo que se ve que 
+	 llegaste al 100% o al porcentaje que hayas llegado en la práctica. </p>
+                                  
+      </font></span>
+                                  
+     </font></font>
+		  </td>
+     </tr>
+                 
+  </tbody>    
+</table>
+    </center>
+          
+</body>
+</html>

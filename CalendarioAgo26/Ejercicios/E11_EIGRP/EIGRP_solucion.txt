@@ -1,0 +1,176 @@
+---------------------------------------------
+ROUTER R1
+---------------------------------------------
+en
+config t
+
+hostname R1
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+banner motd # Prohibido el acceso #
+
+interface G0/0
+description R1 LAN
+ip address 192.168.1.1 255.255.255.0
+no shut
+
+interface S0/0/0
+description Link to R2
+ip address 10.1.1.1 255.255.255.252
+clock rate 64000
+no shut
+
+interface Serial0/0/1
+description Link to R3
+ip address 10.3.3.1 255.255.255.252
+no shut
+
+router eigrp 10
+network 192.168.1.0
+network 10.1.1.0 0.0.0.3
+network 10.3.3.0 0.0.0.3
+!no auto-summary
+passive-interface g0/0
+exit
+
+!255.255.255.255
+!255.255.255.0
+!----------------
+!0.0.0.255
+
+!255.255.255.255
+!255.255.255.252
+!----------------
+  0. 0.0.3
+
+int s0/0/0
+bandwidth 2000
+exit
+
+int s0/0/1
+bandwidth 64
+exit
+
+--------------------------------------------
+ROUTER R2
+--------------------------------------------
+en
+config t
+
+hostname R2
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+interface G0/0
+description R2 LAN
+ip address 192.168.2.1 255.255.255.0
+no shut
+
+interface S0/0/0
+description Link to R1
+ip address 10.1.1.2 255.255.255.252
+no shut
+
+interface S0/0/1
+description Link to R3
+ip address 10.2.2.2 255.255.255.252
+clock rate 64000
+no shut
+
+router eigrp 10
+network 192.168.2.0 
+network 10.1.1.0 0.0.0.3
+network 10.2.2.0 0.0.0.3
+!no auto-summary
+passive-interface g0/0
+exit
+
+int s0/0/0
+bandwidth 2000
+exit
+
+int s0/0/1
+bandwidth 2000
+exit
+----------------------------------------------
+ROUTER R3
+----------------------------------------------
+
+en
+config t
+
+hostname R3
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+interface G0/0
+description R3 LAN
+ip address 192.168.3.1 255.255.255.0
+no shut
+
+interface S0/0/0
+description Link to R1
+ip address 10.3.3.2 255.255.255.252
+clock rate 64000
+no shut
+
+interface Serial0/0/1
+description Link to R2
+ip address 10.2.2.1 255.255.255.252
+no shut
+
+router eigrp 10
+network 192.168.3.0
+network 10.3.3.0 0.0.0.3
+network 10.2.2.0 0.0.0.3
+!no auto-summary
+passive-interface g0/0
+
+int s0/0/0
+bandwidth 64
+exit
+
+int s0/0/1
+bandwidth 2000
+exit
+

@@ -1,0 +1,101 @@
+! RouterUM
+!--------------------------------------
+
+enable
+config t
+
+hostname RouterUM
+
+no ip domain-lookup
+
+enable secret class
+
+line con 0
+password cisco
+login
+
+line vty 0 4
+password cisco
+login
+
+service password-encryption
+
+banner motd #Prohibido entrar sin autorización#
+
+int g0/0/0
+ip address 172.16.0.62 255.255.255.128
+no shut
+
+int g0/0/1
+ip address 172.16.0.241 255.255.255.252
+no shut
+
+int Lo0
+ip address 2.2.2.2 255.255.255.0
+no shut
+
+! Switch SUM
+!--------------------------------------
+
+enable
+config t
+
+hostname SUM
+
+no ip domain-lookup
+
+enable secret class
+
+line con 0
+password cisco
+login
+
+line vty 0 15
+password cisco
+login
+
+banner motd #Prohibido entrar sin autorización#
+
+int vlan 1
+ip address 172.16.0.33 255.255.255.128
+no shut
+
+ip default-gateway 172.16.0.62
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

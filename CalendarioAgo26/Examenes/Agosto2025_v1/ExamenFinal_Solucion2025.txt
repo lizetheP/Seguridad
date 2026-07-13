@@ -1,0 +1,209 @@
+!----------------------
+!Ruteador ISP
+!----------------------
+enable
+config t
+
+hostname ISP
+
+no ip domain lookup
+
+line con 0
+password cisco
+login
+exit
+
+line vty 0 4
+password cisco
+login
+exit
+
+enable password class
+
+int g0/0
+ip address 23.0.0.1 255.0.0.0
+no shut
+exit
+
+int g0/1
+ip address 45.0.0.1 255.0.0.0
+no shut
+exit
+
+int S0/0/0
+ip address 190.4.1.61 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+
+!----------------------
+!Ruteador RConcurso
+!----------------------
+
+enable
+config t
+
+hostname RConcurso
+
+service password-enc
+
+no ip domain lookup
+
+line con 0
+password cisco
+login
+exit
+
+line vty 0 4
+password cisco
+login
+exit
+
+enable password class
+
+int g0/0
+ip add 130.5.9.46 255.255.255.240
+no shut
+exit
+
+int g0/1
+ip add 130.5.9.30 255.255.255.224
+no shut
+exit
+
+int S0/0/0
+ip address 190.4.1.62 255.255.255.252
+no shut
+exit
+
+int S0/0/1
+ip address 130.5.9.57 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+access-list 100 permit tcp any host 200.1.1.9 eq 80
+access-list 100 deny ip any host 200.1.1.9
+access-list 100 permit ip any any 
+
+access-list 110 permit tcp host 130.5.9.34 200.1.1.8 0.0.0.7 eq 20
+access-list 110 permit tcp host 130.5.9.34 200.1.1.8 0.0.0.7 eq 21
+access-list 110 permit tcp host 130.5.9.35 200.1.1.8 0.0.0.7 eq 20
+access-list 110 permit tcp host 130.5.9.35 200.1.1.8 0.0.0.7 eq 21
+access-list 110 deny tcp any 200.1.1.8 0.0.0.7 eq 20
+access-list 110 deny tcp any 200.1.1.8 0.0.0.7 eq 21
+access-list 110 permit ip any any 
+
+int s0/0/1
+ip access-group 110 out
+
+Bloquea el tráfico de los equipos a los servidores por ftp.
+
+access-list 110 deny tcp 130.5.9.0 0.0.0.31 host 200.1.1.10 eq 20
+access-list 110 deny tcp 130.5.9.0 0.0.0.31 host 200.1.1.10 eq 21
+access-list 110 deny tcp 130.5.9.0 0.0.0.31 host 130.5.9.33 eq 20
+access-list 110 deny tcp 130.5.9.0 0.0.0.31 host 130.5.9.33 eq 21
+access-list 110 permit ip any any 
+
+int g0/1
+ip access-group 110 in
+
+! Router RConcurso
+int s0/0/0
+ip access-group 100 in
+ 
+router ospf 1
+network 130.5.9.32 0.0.0.15 area 0
+network 130.5.9.0 0.0.0.31 area 0
+network 130.5.9.56 0.0.0.3 area 0
+default-information originate
+passive-interface s0/0/0
+passive-interface g0/0
+passive-interface g0/1
+exit
+
+!----------------------
+!Switch SConcurso
+!----------------------
+en
+config t
+
+hostname SDirectivos
+
+enable password class
+
+line vty 0 15
+password cisco
+login
+exit
+
+int vlan 1
+ip address 130.5.9.45 255.255.255.240
+no shut
+
+ip default-gateway 130.5.9.46
+
+!----------------------
+!Switch SServidores
+!----------------------
+en
+config t
+
+hostname SServidores
+
+enable password class
+
+line vty 0 15
+password cisco
+login
+exit
+
+int vlan 1
+ip address 200.1.1.13 255.255.255.248
+no shut
+
+ip default-gateway 200.1.1.14
+
+!----------------------
+!Ruteador RServidores
+!----------------------
+
+enable
+config t
+
+hostname RServidores
+
+service password-enc
+
+no ip domain lookup
+
+line con 0
+password cisco
+login
+exit
+
+line vty 0 4
+password cisco
+login
+exit
+
+enable password class
+
+int g0/0
+ip add 200.1.1.14 255.255.255.248
+no shut
+exit
+
+int S0/0/0
+ip address 130.5.9.58 255.255.255.252
+no shut
+exit
+
+router ospf 1
+network 200.1.1.8 0.0.0.7 area 0
+network 130.5.9.56 0.0.0.3 area 0
+passive-interface g0/0
+exit

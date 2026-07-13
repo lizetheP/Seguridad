@@ -1,0 +1,185 @@
+!----------------------
+!Ruteador ISP
+!----------------------
+enable
+config t
+
+hostname ISP
+
+service password-enc
+
+no ip domain lookup
+
+line con 0
+password private
+login
+exit
+
+line vty 0 4
+password public
+login
+exit
+
+enable password private
+
+int g0/0
+ip address 52.94.239.1 255.0.0.0
+no shut
+exit
+
+int g0/1
+ip address 151.101.3.1 255.255.0.0
+no shut
+exit
+
+int S0/0/1
+ip address 192.168.7.6 255.255.255.248
+no shut
+exit
+
+ip route 0.0.0.0 0.0.0.0 s0/0/1
+
+!----------------------
+!Ruteador RBimbo
+!----------------------
+
+enable
+config t
+
+hostname RBimbo
+
+service password-enc
+
+no ip domain lookup
+
+line con 0
+password cisco
+login
+exit
+
+line vty 0 4
+password cisco
+login
+exit
+
+enable password class
+
+int g0/0
+ip add 172.30.31.254 255.255.248.0
+no shut
+exit
+
+int g0/1
+ip add 180.40.255.254 255.255.240.0
+no shut
+exit
+
+int S0/0/0
+ip address 192.168.7.1 255.255.255.248
+clock rate 128000
+no shut
+exit
+
+int S0/0/1
+ip address 180.40.50.2 255.255.255.252
+no shut
+exit
+
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+router ospf 1
+network 180.40.240.0 0.0.15.255 area 0
+network 180.40.50.0 0.0.0.3 area 0
+network 172.30.24.0 0.0.7.255 area 0
+passive-interface g0/0
+passive-interface g0/1
+passive-interface s0/0/0
+default-information originate
+exit
+
+access-list 100 deny tcp any host 52.94.239.35 eq 80
+access-list 100 permit ip any any 
+
+!----------------------
+!Switch SVentas
+!----------------------
+en
+config t
+
+hostname SVentas
+
+enable password class
+
+line vty 0 15
+password cisco
+login
+exit
+
+int vlan 1
+ip address 172.30.31.253 255.255.248.0
+no shut
+
+ip default-gateway 172.30.31.254
+
+!----------------------
+!Switch SDirectivos
+!----------------------
+en
+config t
+
+hostname SDirectivos
+
+enable password class
+
+line vty 0 15
+password cisco
+login
+exit
+
+int vlan 1
+ip address 170.50.227.253 255.255.252.0
+no shut
+
+ip default-gateway 170.50.227.254
+
+!----------------------
+!Ruteador RDirectivos
+!----------------------
+
+enable
+config t
+
+hostname RDirectivos
+
+service password-enc
+
+no ip domain lookup
+
+line con 0
+password cisco
+login
+exit
+
+line vty 0 4
+password cisco
+login
+exit
+
+enable password class
+
+int g0/0
+ip add 170.50.227.254 255.255.252.0
+no shut
+exit
+
+int S0/0/1
+ip address 180.40.50.1 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+router ospf 1
+network 180.40.50.0 0.0.0.3 area 0
+network 170.50.224.0 0.0.3.255 area 0
+passive-interface g0/0
+exit

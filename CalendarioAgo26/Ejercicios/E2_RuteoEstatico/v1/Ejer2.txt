@@ -1,0 +1,102 @@
+--------- ISP --------
+Ya Configurado !!!!
+
+-------- RF -------
+enable
+config t
+
+hostname RF
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+-------- R1 ----------
+enable
+config t
+
+hostname R1 
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+interface Serial0/1/0
+ip address 10.1.1.2 255.255.255.252
+no shut
+exit
+
+interface Serial0/1/1
+ip address 10.1.1.9 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+-------- R2 ----------
+enable
+config t
+
+hostname R2
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+interface Serial0/1/0
+ip address 10.1.1.10 255.255.255.252
+no shut
+
+interface Serial0/1/1
+ip address 10.1.1.6 255.255.255.252
+no shut

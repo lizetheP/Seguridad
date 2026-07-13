@@ -1,0 +1,119 @@
+!----------------------
+!Ruteador RHospital
+!----------------------
+
+enable
+config t
+
+hostname RHospital
+
+service password-enc
+
+no ip domain lookup
+
+line con 0
+password cisco
+login
+exit
+
+line vty 0 4
+password cisco
+login
+exit
+
+enable password class
+
+int g0/0
+ip add 190.168.2.174 255.255.255.240
+no shut
+exit
+
+int g0/1
+ip add 190.168.2.126 255.255.255.128
+no shut
+exit
+
+int S0/0/0
+ip address 200.0.1.241 255.255.255.252
+ip access-group 100 out
+no shut
+exit
+
+int S0/0/1
+ip address 190.168.2.186 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+
+access-list 100 deny tcp any host 100.10.10.10 eq 80
+access-list 100 permit ip any any 
+
+router ospf 1
+network 190.168.2.184 0.0.0.3 area 0
+network 190.168.2.0 0.0.0.127 area 0
+network 190.168.2.160 0.0.0.15 area 0
+default-information originate
+exit
+
+!----------------------
+!Switch SMedicos
+!----------------------
+en
+config t
+
+hostname SMedicos
+
+enable password class
+
+line vty 0 15
+password cisco
+login
+exit
+
+int vlan 1
+ip address 190.168.2.157 255.255.255.224
+no shut
+
+ip default-gateway 190.168.2.158
+
+!----------------------
+!Ruteador RMedicos
+!----------------------
+
+enable
+config t
+
+hostname RMedicos
+
+service password-enc
+
+no ip domain lookup
+
+line con 0
+password cisco
+login
+exit
+
+line vty 0 4
+password cisco
+login
+exit
+
+enable password class
+
+int g0/0
+ip add 190.168.2.158 255.255.255.224
+no shut
+exit
+
+int S0/0/0
+ip address 190.168.2.185 255.255.255.252
+no shut
+exit
+
+router ospf 1
+network 190.168.2.128 0.0.0.31 area 0
+network 190.168.2.184 0.0.0.3 area 0
+exit

@@ -1,0 +1,16 @@
+ROUTER B
+
+access-list 110 deny ip 132.254.89.0 0.0.0.127 132.254.89.192 0.0.0.31
+access-list 110 deny ip 132.254.89.0 0.0.0.127 132.254.89.232 0.0.0.7
+access-list 110 permit ip any any
+
+access-list 120 deny ip 132.254.89.232 0.0.0.7 host 132.254.89.221
+access-list 120 permit ip any any
+
+access-list 130 deny tcp 132.254.89.0 0.0.0.127 host 132.254.89.238 eq www
+access-list 130 deny tcp 132.254.89.0 0.0.0.127 host 132.254.89.238 eq 20
+access-list 130 deny tcp 132.254.89.0 0.0.0.127 host 132.254.89.238 eq ftp
+access-list 130 permit ip any any
+
+access-list 140 deny tcp any host 111.65.32.1 eq www
+access-list 140 permit ip any any

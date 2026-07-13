@@ -1,0 +1,100 @@
+--------- R1 --------
+enable
+config t
+
+hostname R1 
+
+service password-enc
+
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+logging sync
+
+enable password class
+
+int G0/1
+ip address 200.60.1.190 255.255.255.224
+no shut
+
+int S0/0/1
+desc  Interfaz que se conecta con ISP
+ip address 150.10.3.129 255.255.255.252
+clock rate 128000
+no shut
+exit
+
+ip route 0.0.0.0 0.0.0.0 s0/0/1
+
+--------- ISP --------
+enable
+config t
+
+hostname ISP 
+
+service password-enc
+
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+logging sync
+
+line vty 0 4
+password cisco
+login
+logging sync
+
+enable password class
+
+int S0/0/0
+desc  Interfaz que se conecta con R1
+ip address 150.10.3.130 255.255.255.252
+no shut
+
+int Lo0
+desc  Interfaz Lo0
+ip address 6.3.3.1 255.0.0.0
+no shut
+
+int Lo1
+desc  Interfaz Lo1
+ip address 180.5.5.5 255.255.0.0
+no shut
+exit
+
+! RUTA ESTATICA DIRECTAMENTE CONECTADA HACIA SUBRED
+! ROSA
+ip route 200.60.1.160 255.255.255.224 s0/0/0
+
+--------- S1 --------
+enable
+config t
+
+hostname S1 
+
+no ip domain-lookup
+
+line con 0
+password cisco
+login
+
+line vty 0 4
+password cisco
+login
+
+enable password class
+
+int VLAN 1
+ip address 200.60.1.161 255.255.255.224
+no shut
+
+ip default-gateway 200.60.1.190

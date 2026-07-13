@@ -1,0 +1,71 @@
+--------- MyISP --------
+Ya Configurado !!!!
+
+-------- RFrontera -------
+enable
+config t
+
+hostname RF
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+int g0/0
+desc Interfaz de la subred Amarillo
+ip address 
+no shut
+
+-------- RA ----------
+enable
+config t
+
+hostname RA 
+
+!Encriptar passwords
+service password-enc
+
+! Desactivar DNS
+no ip domain-lookup
+
+! Password de la consola
+line con 0
+password cisco
+login
+logging sync
+
+! Conexión TELNET o para configurar SSH
+line vty 0 4
+password cisco
+login
+logging sync
+
+! Password para entrar a modo privilegiado
+enable secret class
+
+int g0/0
+description Subred del lado izquierdo
+ip address 
+no shut
+
+int g0/1
+description Subred del lado derecho
+ip address 
+no shut

@@ -1,0 +1,44 @@
+! Router Frontera
+!-------------------
+
+!Ruta estática por default IPv4 directamente conectada
+!hacia ISP1
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+!hacia ISP2
+ip route 0.0.0.0 0.0.0.0 s0/0/1 5
+
+!Ruta por default recursiva IPv6
+ipv6 route ::/0 2001:DB8:A:1::1
+ipv6 route ::/0 2001:DB8:A:2::5 5
+
+! ISP1
+!--------------------
+!Ruta estática IPv4 del siguiente salto LAN 1
+ip route 192.168.10.16 255.255.255.240 10.10.10.2
+!Ruta estática IPv4 del siguiente salto LAN 2
+ip route 192.168.11.32 255.255.255.224 10.10.10.2
+
+!Ruta estática IPv4 directamente conectada LAN 1
+ip route 192.168.10.16 255.255.255.240 g0/0 5
+!Ruta estática IPv4 directamente conectada LAN 2
+ip route 192.168.11.32 255.255.255.224 g0/0 5
+
+ipv6 route 2001:DB8:1:10::/64 2001:DB8:A:1::2
+ipv6 route 2001:DB8:1:11::/64 2001:DB8:A:1::2
+
+ipv6 route 2001:DB8:1:10::/64 g0/0 5 
+ipv6 route 2001:DB8:1:11::/64 g0/0 5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
