@@ -1,0 +1,14 @@
+401
+
+Lunes, martes y jueves de 9:00 a.m. a 1:00 p.m.
+Miércoles de 4:00 a 8:00 p.m.
+
+501
+
+Lunes, Jueves y Viernes de 9:00 a.m. a 1:00 p.m. (Salón 2002)
+Martes de 4:00 a 8:00 p.m. (Salón 2003)
+
+502
+
+Horario 1: Lunes, Miércoles y Jueves 3:00 a 7:00 p.m. Salón: 2101
+Horario 3: Martes 4:00 a 8:00 p.m. Salón: 3301
