@@ -1,0 +1,21 @@
+
+Buen trabajo, estimado Nicolás. Solamente tengo algunos comentarios:
+
+Se le pidió confgurar el protocolo eigrp y configuró ospf (- 5 puntos)
+
+Faltó hacer pasiva la interface s0/1/1 del router Rfrontera. (-1 punto)
+
+Muy buen trabajo, estimada Laura. Solamente tengo algunos comentarios:
+
+Faltó hacer pasiva la interface g0/0 del ruteador ROeste. (-1 punto)
+Faltó hacer pasiva la interface g0/0 del ruteador REste. (-1 punto)
+Faltó hacer pasiva la interface s0/1/1 del router Rfrontera. (-1 punto)
+
+Buen trabajo, estimado David. 
+
+Solo tengo algunos comentarios:
+
+No funcionan pruebas de conectividad al exterior (-5 puntos), ya que faltó configurar la interface s0/1/1 en el ruteador RFrontera. (- 5 puntos)
+Se configuró un protocolo incorrecto, se solicitaba configurar eigrp y configuró ospf (-5 puntos)
+En RFrontera faltó configurar una ruta por default hacia el exterior. (-5 puntos)
+En RFrontera faltó redistribuir la ruta por default hacia los routers internos de la empresa (-5 puntos)
